@@ -51,12 +51,11 @@
      <widget class="QTabWidget" name="tabWidget">
       <property name="font">
        <font>
-        <family>Avenir</family>
         <pointsize>14</pointsize>
        </font>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -71,7 +70,6 @@
              <widget class="QLabel" name="label">
               <property name="font">
                <font>
-                <family>Avenir</family>
                 <pointsize>14</pointsize>
                </font>
               </property>
@@ -87,7 +85,6 @@
              <widget class="QLabel" name="label_2">
               <property name="font">
                <font>
-                <family>Avenir</family>
                 <pointsize>24</pointsize>
                </font>
               </property>
@@ -107,7 +104,6 @@
              <widget class="QLabel" name="label_3">
               <property name="font">
                <font>
-                <family>Avenir</family>
                 <pointsize>14</pointsize>
                </font>
               </property>
@@ -123,7 +119,6 @@
              <widget class="QLabel" name="label_4">
               <property name="font">
                <font>
-                <family>Avenir</family>
                 <pointsize>24</pointsize>
                </font>
               </property>
@@ -143,7 +138,6 @@
              <widget class="QLabel" name="label_5">
               <property name="font">
                <font>
-                <family>Avenir</family>
                 <pointsize>14</pointsize>
                </font>
               </property>
@@ -159,7 +153,6 @@
              <widget class="QLabel" name="label_6">
               <property name="font">
                <font>
-                <family>Avenir</family>
                 <pointsize>24</pointsize>
                </font>
               </property>
@@ -179,7 +172,6 @@
              <widget class="QLabel" name="label_7">
               <property name="font">
                <font>
-                <family>Avenir</family>
                 <pointsize>14</pointsize>
                </font>
               </property>
@@ -195,7 +187,6 @@
              <widget class="QLabel" name="label_8">
               <property name="font">
                <font>
-                <family>Avenir</family>
                 <pointsize>24</pointsize>
                </font>
               </property>
@@ -217,7 +208,7 @@
        <attribute name="title">
         <string>CaseList</string>
        </attribute>
-       <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_10">
           <item>
@@ -236,95 +227,141 @@
          </layout>
         </item>
         <item>
-         <widget class="QGroupBox" name="groupBox">
-          <property name="title">
-           <string>Case Detail</string>
+         <widget class="QTabWidget" name="tabWidget_5">
+          <property name="currentIndex">
+           <number>0</number>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_11">
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_2">
-             <item>
-              <widget class="QLabel" name="label_18">
-               <property name="text">
-                <string>Case ID:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_20">
-               <property name="text">
-                <string>123456</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_3">
-             <item>
-              <widget class="QLabel" name="label_19">
-               <property name="text">
-                <string>Case Date:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_21">
-               <property name="text">
-                <string>11/12/2022</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <widget class="QLabel" name="label_22">
-             <property name="text">
-              <string>Case Description:</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPlainTextEdit" name="plainTextEdit"/>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_4">
-             <item>
-              <widget class="QPushButton" name="pushButton_5">
-               <property name="text">
-                <string>Update</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="pushButton_17">
-               <property name="text">
-                <string>New</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="pushButton_6">
-               <property name="text">
-                <string>Clear</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="pushButton_7">
-               <property name="text">
-                <string>Delete</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-          </layout>
+          <widget class="QWidget" name="tab_3">
+           <attribute name="title">
+            <string>Case View</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout_6">
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_5">
+              <item>
+               <widget class="QLabel" name="label_53">
+                <property name="text">
+                 <string>Case ID:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_55">
+                <property name="text">
+                 <string>123456</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_17">
+              <item>
+               <widget class="QLabel" name="label_57">
+                <property name="text">
+                 <string>Case Date:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_59">
+                <property name="text">
+                 <string>11/12/2022</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_60">
+              <property name="text">
+               <string>Case Description:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPlainTextEdit" name="plainTextEdit_6"/>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="tab_4">
+           <attribute name="title">
+            <string>Case Update/New</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout_7">
+            <item>
+             <layout class="QGridLayout" name="gridLayout_5">
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_61">
+                <property name="text">
+                 <string>Case ID:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLineEdit" name="lineEdit_9"/>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_63">
+                <property name="text">
+                 <string>Case Date:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="lineEdit_10"/>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_65">
+              <property name="text">
+               <string>Case Description:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPlainTextEdit" name="plainTextEdit_7"/>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_20">
+              <item>
+               <widget class="QPushButton" name="pushButton_20">
+                <property name="text">
+                 <string>Update</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton_21">
+                <property name="text">
+                 <string>New</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton_22">
+                <property name="text">
+                 <string>Clear</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton_23">
+                <property name="text">
+                 <string>Delete</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
          </widget>
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="widget">
        <attribute name="title">
         <string>RMAManagement</string>
        </attribute>
@@ -360,7 +397,7 @@
         <item>
          <widget class="QTabWidget" name="tabWidget_4">
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="tab_12">
            <attribute name="title">
