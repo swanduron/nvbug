@@ -2,7 +2,7 @@ from sqlalchemy import *
 from sqlalchemy.orm import *
 from PyQt6.QtCore import QDate
 
-engine = create_engine('sqlite:///nvbug.db', echo=True)
+
 Base = declarative_base()
 
 class Case(Base):
@@ -20,8 +20,10 @@ class Nvbug(Base):
     id = Column(Integer, primary_key=True)
     case_id = Column(Integer, ForeignKey('case.id'))
     nvbug_id = Column(String(40))
+    description = Column(String(400))
     date = Column(String(40))
     rmas = relationship('Rma', backref='nvbug')
+    logs = relationship('logInfo', backref='nvbug')
 
 class Rma(Base):
 
@@ -30,10 +32,12 @@ class Rma(Base):
     nvbug_id = Column(Integer, ForeignKey('nvbug.id'))
     rma_id = Column(String(40))
     date = Column(String(40))
+    description = Column(String(400))
     engineers = relationship('Engineer', secondary='linkrmaengineer')
     contacts = relationship('Contact', secondary='linkrmacontacts')
     old_hardware = relationship('Oldcomponent', backref=backref('rma', uselist=False))
     new_hardware = relationship('Newcomponent', backref=backref('rma', uselist=False))
+    logs = relationship('logInfo', backref='rma')
 
 # Link
 
@@ -120,8 +124,19 @@ class Oldcomponent(Base):
     desc = Column(String(100))
 
 # add express information
+class logInfo(Base):
+
+    __tablename__ = 'loginfo'
+    id = Column(Integer, primary_key=True)
+    date = Column(String(40))
+    content = Column(String(2000))
+    rma_id = Column(Integer, ForeignKey('rma.id'))
+    nvbug_id = Column(Integer, ForeignKey('nvbug.id'))
+
 
 if __name__ == '__main__':
+    engine = create_engine('sqlite:///nvbug.db', echo=True)
+    #
     # Case.__table__.create(engine)
     # Nvbug.__table__.create(engine)
     # Rma.__table__.create(engine)
@@ -134,8 +149,10 @@ if __name__ == '__main__':
     # Customer.__table__.create(engine)
     # Newcomponent.__table__.create(engine)
     # Oldcomponent.__table__.create(engine)
+    # logInfo.__table__.create(engine)
 
     # Data initlization
+    engine = create_engine('sqlite:///nvbug.db', echo=True)
     currentDate = QDate.currentDate().toPyDate()
     DBSession = sessionmaker(bind=engine)
     session = DBSession()
