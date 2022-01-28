@@ -291,12 +291,8 @@
            <layout class="QVBoxLayout" name="verticalLayout_7">
             <item>
              <layout class="QGridLayout" name="gridLayout_5">
-              <item row="1" column="0">
-               <widget class="QLabel" name="label_63">
-                <property name="text">
-                 <string>Case Date:</string>
-                </property>
-               </widget>
+              <item row="0" column="1">
+               <widget class="QLineEdit" name="lineEdit_9"/>
               </item>
               <item row="0" column="0">
                <widget class="QLabel" name="label_61">
@@ -305,18 +301,15 @@
                 </property>
                </widget>
               </item>
-              <item row="1" column="1">
-               <widget class="QLineEdit" name="lineEdit_10"/>
-              </item>
-              <item row="0" column="1">
-               <widget class="QLineEdit" name="lineEdit_9"/>
-              </item>
-              <item row="1" column="2">
-               <widget class="QPushButton" name="pushButton_5">
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_63">
                 <property name="text">
-                 <string>Pick Date</string>
+                 <string>Case Date:</string>
                 </property>
                </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="lineEdit_10"/>
               </item>
              </layout>
             </item>
@@ -334,6 +327,9 @@
              <layout class="QHBoxLayout" name="horizontalLayout_20">
               <item>
                <widget class="QPushButton" name="pushButton_20">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
                 <property name="text">
                  <string>Update</string>
                 </property>
@@ -341,6 +337,9 @@
               </item>
               <item>
                <widget class="QPushButton" name="pushButton_21">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
                 <property name="text">
                  <string>New</string>
                 </property>
@@ -348,6 +347,9 @@
               </item>
               <item>
                <widget class="QPushButton" name="pushButton_22">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
                 <property name="text">
                  <string>Add</string>
                 </property>
@@ -355,6 +357,9 @@
               </item>
               <item>
                <widget class="QPushButton" name="pushButton_23">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
                 <property name="text">
                  <string>Delete</string>
                 </property>
@@ -404,7 +409,7 @@
         <item>
          <widget class="QTabWidget" name="tabWidget_4">
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="tab_12">
            <attribute name="title">
@@ -499,6 +504,9 @@
               </item>
               <item row="1" column="2">
                <widget class="QCheckBox" name="checkBox">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="text">
                  <string>ComponentSend</string>
                 </property>
@@ -506,6 +514,9 @@
               </item>
               <item row="2" column="2">
                <widget class="QCheckBox" name="checkBox_2">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="text">
                  <string>ComponentRecv</string>
                 </property>
@@ -513,6 +524,9 @@
               </item>
               <item row="3" column="2">
                <widget class="QCheckBox" name="checkBox_3">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="text">
                  <string>RmaComp</string>
                 </property>
@@ -520,6 +534,9 @@
               </item>
               <item row="4" column="2">
                <widget class="QCheckBox" name="checkBox_4">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="text">
                  <string>RmaReturn</string>
                 </property>
@@ -559,7 +576,7 @@
               <item row="4" column="0">
                <widget class="QLabel" name="label_56">
                 <property name="text">
-                 <string>RMA EDT:</string>
+                 <string>RMA ETD:</string>
                 </property>
                </widget>
               </item>
@@ -647,6 +664,13 @@
              </layout>
             </item>
             <item>
+             <widget class="QPushButton" name="pushButton_5">
+              <property name="text">
+               <string>Add Log</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QLabel" name="label_49">
               <property name="text">
                <string>RMA target:</string>
@@ -670,6 +694,9 @@
              <layout class="QHBoxLayout" name="horizontalLayout_16">
               <item>
                <widget class="QPushButton" name="pushButton_14">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
                 <property name="text">
                  <string>Update</string>
                 </property>
@@ -677,6 +704,9 @@
               </item>
               <item>
                <widget class="QPushButton" name="pushButton_18">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
                 <property name="text">
                  <string>New</string>
                 </property>
@@ -684,6 +714,9 @@
               </item>
               <item>
                <widget class="QPushButton" name="pushButton_15">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
                 <property name="text">
                  <string>Add</string>
                 </property>
@@ -691,6 +724,9 @@
               </item>
               <item>
                <widget class="QPushButton" name="pushButton_16">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
                 <property name="text">
                  <string>Delete</string>
                 </property>
@@ -949,7 +985,7 @@
      <x>0</x>
      <y>0</y>
      <width>1133</width>
-     <height>24</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
