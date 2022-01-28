@@ -685,14 +685,14 @@
               <item>
                <widget class="QPushButton" name="pushButton_15">
                 <property name="text">
-                 <string>Clear</string>
+                 <string>Add</string>
                 </property>
                </widget>
               </item>
               <item>
                <widget class="QPushButton" name="pushButton_16">
                 <property name="text">
-                 <string>New</string>
+                 <string>Delete</string>
                 </property>
                </widget>
               </item>
