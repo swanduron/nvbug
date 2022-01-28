@@ -48,7 +48,15 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         self.pushButton_20.clicked.connect(self.saveCaseDescChanges)
         self.pushButton_22.clicked.connect(self.addNewCase)
         self.pushButton_5.clicked.connect(self.inputData)
-
+        self.lineEdit_10.installEventFilter(self)
+    # below is a eventFilter to add additional action when the lineEdit is pushed
+    def eventFilter(self, a0: 'QObject', a1: 'QEvent') -> bool:
+        if a0 is self.lineEdit_10:
+            if self.lineEdit_10.isEnabled():
+                if a1.type() == 2:
+                    self.inputData()
+        return super(Casewindow, self).eventFilter(a0, a1)
+    
 
     def fillCaseList(self):
         res = self.session.query(Case.case_id).all()
