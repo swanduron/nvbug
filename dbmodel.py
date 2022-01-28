@@ -12,26 +12,19 @@ class Case(Base):
     case_id = Column(String(40))
     date = Column(String(40))
     description = Column(String(400))
-    nvbugs = relationship('Nvbug', backref='case')
+    rmas = relationship('Rma', backref='case')
+    logs = relationship('logInfo', backref='case')
 
-class Nvbug(Base):
-
-    __tablename__ = 'nvbug'
-    id = Column(Integer, primary_key=True)
-    case_id = Column(Integer, ForeignKey('case.id'))
-    nvbug_id = Column(String(40))
-    description = Column(String(400))
-    date = Column(String(40))
-    rmas = relationship('Rma', backref='nvbug')
-    logs = relationship('logInfo', backref='nvbug')
 
 class Rma(Base):
 
     __tablename__ = 'rma'
     id = Column(Integer, primary_key=True)
-    nvbug_id = Column(Integer, ForeignKey('nvbug.id'))
+    case_id = Column(Integer, ForeignKey('case.id'))
     rma_id = Column(String(40))
     date = Column(String(40))
+    rmaETD = Column(String(40))
+    rmaSrvDate = Column(String(40))
     description = Column(String(400))
     # Add 4 flags to mark the progress during provide service
     componentsSendFlag = Column(Boolean, default=False)
@@ -136,14 +129,13 @@ class logInfo(Base):
     date = Column(String(40))
     content = Column(String(2000))
     rma_id = Column(Integer, ForeignKey('rma.id'))
-    nvbug_id = Column(Integer, ForeignKey('nvbug.id'))
+    case_id = Column(Integer, ForeignKey('case.id'))
 
 
 if __name__ == '__main__':
     engine = create_engine('sqlite:///nvbug.db', echo=True)
     #
     # Case.__table__.create(engine)
-    # Nvbug.__table__.create(engine)
     # Rma.__table__.create(engine)
     # Linkrmaengineer.__table__.create(engine)
     # Linkrmacontacts.__table__.create(engine)
@@ -157,15 +149,20 @@ if __name__ == '__main__':
     # logInfo.__table__.create(engine)
 
     # Data initlization
-    currentDate = QDate.currentDate().toPyDate()
-    DBSession = sessionmaker(bind=engine)
-    session = DBSession()
-    case = Case(case_id='0099842', date=currentDate, description='demo case')
-    nvbug = Nvbug(nvbug_id='49032', date=currentDate)
-    case.nvbugs.append(nvbug)
-    rma = Rma(rma_id='24231', date=currentDate)
-    nvbug.rmas.append(rma)
+    # currentDate = QDate.currentDate().toPyDate()
+    # DBSession = sessionmaker(bind=engine)
+    # session = DBSession()
+    # case = Case(case_id='0099842', date=currentDate, description='demo case')
+    # rma = Rma(rma_id='24231', date=currentDate)
+    # case.rmas.append(rma)
+    #
+    #
+    # session.add(case)
+    # session.commit()
 
-
-    session.add(case)
-    session.commit()
+    # query data test
+    # DBSession = sessionmaker(bind=engine)
+    # session = DBSession()
+    # res = session.query(Case).filter_by(case_id='0099842').one()
+    # for i in res.rmas:
+    #     print(i.rma_id)

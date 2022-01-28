@@ -14,16 +14,12 @@ class Casewindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super(Casewindow, self).__init__()
         self.setupUi(self)
-        self.appearanceAdjest()
         self.engine = create_engine('sqlite:///nvbug.db', echo=False)
         self.DBSession = sessionmaker(bind=self.engine)
         self.session = self.DBSession()
-        self.caseListProcessor()
+        self.rmaTreeProcessor()
 
 
-    def appearanceAdjest(self):
-        # self.tabWidget.tabBar().setVisible(False)
-        pass
 
     # CaseList operation
     def caseListProcessor(self):
@@ -129,6 +125,46 @@ class Casewindow(QMainWindow, Ui_MainWindow):
             self.lineEdit_10.setText(str(selectedDate))
 
     # RMA operation
+
+
+    def rmaTreeProcessor(self):
+        self.fillTree()
+        self.rmaActionAttached()
+
+    def rmaAppearanceAdjust(self):
+        pass
+
+    def rmaActionAttached(self):
+        self.treeWidget_2.clicked.connect(self.fillRmainfo)
+
+    def fillTree(self):
+        res = self.session.query(Case.case_id).all()
+        case_id_list = [i[0] for i in res]
+        for case_id in case_id_list:
+            root = QTreeWidgetItem(self.treeWidget_2)
+            root.setText(0, case_id)
+            parentCase = self.session.query(Case).filter_by(case_id=case_id).one()
+            for rmaInstance in parentCase.rmas:
+                child = QTreeWidgetItem(root)
+                child.setText(1, rmaInstance.rma_id)
+
+    def fillRmainfo(self):
+        currentItem = self.treeWidget_2.currentItem()
+        if not currentItem.text(0):
+            rma_id = currentItem.text(1)
+            rmaInstance = self.session.query(Rma).filter_by(rma_id=rma_id).one()
+            self.label_35.setText(rmaInstance.case.case_id)
+            self.label_37.setText(rma_id)
+            self.label_41.setText(rmaInstance.date)
+            self.label_43.setText(rmaInstance.rmaETD)
+            self.label_45.setText(rmaInstance.rmaSrvDate)
+            self.checkBox.setCheckState(rmaInstance.componentsSendFlag)
+            self.checkBox_2.setCheckState(rmaInstance.componentsRecvFlag)
+            self.checkBox_3.setCheckState(rmaInstance.rmaCompFlag)
+            self.checkBox_4.setCheckState(rmaInstance.rmaReturnFlag)
+
+
+
 
 
 if __name__ == '__main__':
