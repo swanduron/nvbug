@@ -33,6 +33,11 @@ class Rma(Base):
     rma_id = Column(String(40))
     date = Column(String(40))
     description = Column(String(400))
+    # Add 4 flags to mark the progress during provide service
+    componentsSendFlag = Column(Boolean, default=False)
+    componentsRecvFlag = Column(Boolean, default=False)
+    rmaCompFlag = Column(Boolean, default=False)
+    rmaReturnFlag = Column(Boolean, default=False)
     engineers = relationship('Engineer', secondary='linkrmaengineer')
     contacts = relationship('Contact', secondary='linkrmacontacts')
     old_hardware = relationship('Oldcomponent', backref=backref('rma', uselist=False))
@@ -152,7 +157,6 @@ if __name__ == '__main__':
     # logInfo.__table__.create(engine)
 
     # Data initlization
-    engine = create_engine('sqlite:///nvbug.db', echo=True)
     currentDate = QDate.currentDate().toPyDate()
     DBSession = sessionmaker(bind=engine)
     session = DBSession()

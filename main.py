@@ -33,12 +33,14 @@ class Casewindow(QMainWindow, Ui_MainWindow):
 
     def caseListAppearanceAdject(self):
         self.pushButton_20.setDisabled(True)
-        self.pushButton_21.setDisabled(True)
+        # self.pushButton_21.setDisabled(False)
         self.pushButton_22.setDisabled(True)
         self.pushButton_23.setDisabled(True)
         self.lineEdit_9.setDisabled(True)
+        self.lineEdit_9.setInputMask('00000000')
         self.lineEdit_10.setDisabled(True)
         self.lineEdit_10.setInputMask('0000-00-00')
+        self.pushButton_5.setDisabled(True)
 
     def listActionAttached(self):
         self.listWidget.clicked.connect(self.fillCaseInfo)
@@ -51,6 +53,7 @@ class Casewindow(QMainWindow, Ui_MainWindow):
     def fillCaseList(self):
         res = self.session.query(Case.case_id).all()
         filling_list = [i[0] for i in res]
+        self.listWidget.clear()
         self.listWidget.addItems(filling_list)
 
     def fillCaseInfo(self, event):
@@ -67,11 +70,13 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         self.pushButton_20.setDisabled(False)
         self.pushButton_23.setDisabled(False)
         self.pushButton_21.setDisabled(False)
-        self.pushButton_22.setDisabled(False)
+
 
     def createBlankCaseTmpl(self):
         self.pushButton_20.setDisabled(True)
         self.pushButton_23.setDisabled(True)
+        self.pushButton_22.setDisabled(False)
+        self.pushButton_5.setDisabled(False)
         self.lineEdit_9.setDisabled(False)
         self.lineEdit_9.setText('')
         self.lineEdit_10.setDisabled(False)
@@ -92,7 +97,21 @@ class Casewindow(QMainWindow, Ui_MainWindow):
             self.session.commit()
 
     def addNewCase(self):
-        pass
+        addDate = self.lineEdit_10.text()
+        case_id = self.lineEdit_9.text()
+        description = self.plainTextEdit_7.toPlainText()
+        if self.session.query(Case).filter_by(case_id=case_id).all():
+            QMessageBox.warning(self, 'Warning', 'The Case ID is duplicated, please check it!',
+                                buttons=QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Ok)
+        elif not addDate or not case_id:
+            QMessageBox.warning(self, 'Warning', 'Not all of fields were filled, please check it!',
+                                buttons=QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Ok)
+        else:
+            case = Case(case_id=case_id, date=addDate, description=description)
+            self.session.add(case)
+            self.session.commit()
+            self.fillCaseList()
+            self.caseListAppearanceAdject()
 
     def inputData(self):
         dialogBox = dateSelector()
@@ -100,6 +119,9 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         selectedDate = dialogBox.getDate().toPyDate()
         if dialogBox.result():
             self.lineEdit_10.setText(str(selectedDate))
+
+    # RMA operation
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

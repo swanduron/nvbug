@@ -55,7 +55,7 @@
        </font>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -497,6 +497,34 @@
                 </property>
                </widget>
               </item>
+              <item row="1" column="2">
+               <widget class="QCheckBox" name="checkBox">
+                <property name="text">
+                 <string>ComponentSend</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="2">
+               <widget class="QCheckBox" name="checkBox_2">
+                <property name="text">
+                 <string>ComponentRecv</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="2">
+               <widget class="QCheckBox" name="checkBox_3">
+                <property name="text">
+                 <string>RmaComp</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="2">
+               <widget class="QCheckBox" name="checkBox_4">
+                <property name="text">
+                 <string>RmaReturn</string>
+                </property>
+               </widget>
+              </item>
              </layout>
             </item>
             <item>
@@ -525,7 +553,7 @@
            <attribute name="title">
             <string>RMA Update/New</string>
            </attribute>
-           <layout class="QVBoxLayout" name="verticalLayout_17">
+           <layout class="QVBoxLayout" name="verticalLayout_8">
             <item>
              <layout class="QGridLayout" name="gridLayout_4">
               <item row="4" column="0">
@@ -541,9 +569,6 @@
                  <string>RMA SrvDate:</string>
                 </property>
                </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QLineEdit" name="lineEdit_3"/>
               </item>
               <item row="1" column="1">
                <widget class="QLineEdit" name="lineEdit_4"/>
@@ -587,6 +612,37 @@
               </item>
               <item row="5" column="1">
                <widget class="QLineEdit" name="lineEdit_8"/>
+              </item>
+              <item row="1" column="2">
+               <widget class="QCheckBox" name="checkBox_5">
+                <property name="text">
+                 <string>ComponentSend</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="2">
+               <widget class="QCheckBox" name="checkBox_7">
+                <property name="text">
+                 <string>ComponentRecv</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="2">
+               <widget class="QCheckBox" name="checkBox_8">
+                <property name="text">
+                 <string>RmaComp</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="2">
+               <widget class="QCheckBox" name="checkBox_6">
+                <property name="text">
+                 <string>RmaReturn</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QComboBox" name="comboBox_2"/>
               </item>
              </layout>
             </item>
@@ -893,7 +949,7 @@
      <x>0</x>
      <y>0</y>
      <width>1133</width>
-     <height>21</height>
+     <height>24</height>
     </rect>
    </property>
   </widget>
