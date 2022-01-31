@@ -55,7 +55,7 @@
        </font>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -618,9 +618,6 @@
                 </property>
                </widget>
               </item>
-              <item row="2" column="1">
-               <widget class="QLineEdit" name="lineEdit_5"/>
-              </item>
               <item row="3" column="1">
                <widget class="QLineEdit" name="lineEdit_6"/>
               </item>
@@ -660,6 +657,13 @@
               </item>
               <item row="0" column="1">
                <widget class="QComboBox" name="comboBox_2"/>
+              </item>
+              <item row="2" column="1">
+               <widget class="QPushButton" name="pushButton_6">
+                <property name="text">
+                 <string>Extended Info</string>
+                </property>
+               </widget>
               </item>
              </layout>
             </item>
@@ -779,6 +783,11 @@
                   <string>Engineer</string>
                  </property>
                 </column>
+                <column>
+                 <property name="text">
+                  <string>eng_id</string>
+                 </property>
+                </column>
                </widget>
               </item>
              </layout>
@@ -819,7 +828,7 @@
                   <item>
                    <widget class="QLabel" name="label_26">
                     <property name="text">
-                     <string>11/12/2022</string>
+                     <string/>
                     </property>
                    </widget>
                   </item>
@@ -854,7 +863,7 @@
                   <item>
                    <widget class="QPushButton" name="pushButton_9">
                     <property name="text">
-                     <string>Clear</string>
+                     <string>Add</string>
                     </property>
                    </widget>
                   </item>
@@ -873,7 +882,7 @@
                <attribute name="title">
                 <string>Engineer</string>
                </attribute>
-               <layout class="QVBoxLayout" name="verticalLayout_14">
+               <layout class="QVBoxLayout" name="verticalLayout_9">
                 <item>
                  <layout class="QHBoxLayout" name="horizontalLayout_12">
                   <item>
@@ -914,7 +923,7 @@
                   <item>
                    <widget class="QLabel" name="label_31">
                     <property name="text">
-                     <string>11/12/2022</string>
+                     <string/>
                     </property>
                    </widget>
                   </item>
@@ -940,9 +949,16 @@
                    </widget>
                   </item>
                   <item>
+                   <widget class="QPushButton" name="pushButton_24">
+                    <property name="text">
+                     <string>New</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
                    <widget class="QPushButton" name="pushButton_12">
                     <property name="text">
-                     <string>Clear</string>
+                     <string>Add</string>
                     </property>
                    </widget>
                   </item>
@@ -985,7 +1001,7 @@
      <x>0</x>
      <y>0</y>
      <width>1133</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>

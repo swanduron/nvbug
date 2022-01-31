@@ -20,6 +20,7 @@ class Casewindow(QMainWindow, Ui_MainWindow):
 
         self.pushButton_2.clicked.connect(self.page2)
         self.pushButton_3.clicked.connect(self.page3)
+        self.pushButton_4.clicked.connect(self.page4)
 
     def page2(self):
         self.tabWidget.setCurrentIndex(1)
@@ -27,6 +28,9 @@ class Casewindow(QMainWindow, Ui_MainWindow):
     def page3(self):
         self.tabWidget.setCurrentIndex(2)
         self.rmaTreeProcessor()
+    def page4(self):
+        self.tabWidget.setCurrentIndex(3)
+        self.supporterProcessor()
 
 
     def eventFilter(self, a0: 'QObject', a1: 'QEvent') -> bool:
@@ -124,9 +128,11 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         if self.session.query(Case).filter_by(case_id=case_id).all():
             QMessageBox.warning(self, 'Warning', 'The Case ID is duplicated, please check it!',
                                 buttons=QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Ok)
+            return
         elif not addDate or not case_id:
             QMessageBox.warning(self, 'Warning', 'Not all of fields were filled, please check it!',
                                 buttons=QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Ok)
+            return
         else:
             case = Case(case_id=case_id, date=addDate, description=description)
             self.session.add(case)
@@ -162,7 +168,9 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         self.lineEdit_6.installEventFilter(self)
         self.lineEdit_7.installEventFilter(self)
         self.lineEdit_8.installEventFilter(self)
-        self.pushButton_18.clicked.connect(self.newARma)
+        self.pushButton_18.clicked.connect(self.createBlankRma)
+        self.pushButton_15.clicked.connect(self.saveNewRma)
+        self.pushButton_14.clicked.connect(self.updateRma)
 
     def fillTree(self):
         res = self.session.query(Case.case_id).all()
@@ -177,12 +185,12 @@ class Casewindow(QMainWindow, Ui_MainWindow):
                 child.setText(1, rmaInstance.rma_id)
 
     def fillRmainfo(self):
+        self.comboBox_2.setDisabled(True)
         currentItem = self.treeWidget_2.currentItem()
         # If selected item has no column 0
         if not currentItem.text(0):
             rma_id = currentItem.text(1)
             self.pushButton_14.setDisabled(False)
-            self.pushButton_15.setDisabled(False)
             self.pushButton_16.setDisabled(False)
             self.pushButton_18.setDisabled(False)
             rmaInstance = self.session.query(Rma).filter_by(rma_id=rma_id).one()
@@ -213,7 +221,6 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         else:
             # Clicked a case instead of RMA
             self.pushButton_14.setDisabled(True)
-            self.pushButton_15.setDisabled(True)
             self.pushButton_16.setDisabled(True)
             self.pushButton_18.setDisabled(False)
             self.label_35.setText('')
@@ -257,7 +264,8 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         if dialogBox.result():
             self.lineEdit_8.setText(str(selectedDate))
 
-    def newARma(self):
+    def createBlankRma(self):
+        self.comboBox_2.setDisabled(False)
         self.pushButton_15.setDisabled(False)
         self.pushButton_14.setDisabled(True)
         self.pushButton_16.setDisabled(True)
@@ -275,6 +283,174 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         self.checkBox_8.setChecked(False)
         self.checkBox_6.setChecked(False)
 
+    def saveNewRma(self):
+        rma_id = self.lineEdit_4.text()
+        rmaDup = self.session.query(Rma).filter_by(rma_id=rma_id).all()
+        if rmaDup:
+            res = QMessageBox.warning(self, 'Duplicate RMA ID', 'You input RMA ID is duplicated!',
+                                      buttons=QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Ok)
+            return
+        if not rma_id:
+            QMessageBox.warning(self, 'Insufficient Information', 'RMA ID is mandatory Field!')
+            return
+        initDate = self.lineEdit_6.text()
+        rmaETD = self.lineEdit_7.text()
+        rmaSrvDate = self.lineEdit_8.text()
+        componentSend =self.checkBox_5.isChecked()
+        componentRecv = self.checkBox_7.isChecked()
+        rmaComp = self.checkBox_8.isChecked()
+        rmaReturn = self.checkBox_6.isChecked()
+        parentCaseID = self.comboBox_2.currentText()
+        rma = Rma(rma_id=rma_id, date=initDate, rmaETD=rmaETD, rmaSrvDate=rmaSrvDate,
+                  componentsSendFlag=componentSend, componentsRecvFlag=componentRecv,
+                  rmaCompFlag=rmaComp, rmaReturnFlag=rmaReturn)
+        parentCase = self.session.query(Case).filter_by(case_id=parentCaseID).one()
+        parentCase.rmas.append(rma)
+        self.session.commit()
+        self.fillTree()
+
+    def updateRma(self):
+        # This function is used to update a rma information
+        rma_id = self.lineEdit_4.text()
+        initDate = self.lineEdit_6.text()
+        rmaETD = self.lineEdit_7.text()
+        rmaSrvDate = self.lineEdit_8.text()
+        componentSend = self.checkBox_5.isChecked()
+        componentRecv = self.checkBox_7.isChecked()
+        rmaComp = self.checkBox_8.isChecked()
+        rmaReturn = self.checkBox_6.isChecked()
+
+        res = QMessageBox.warning(self, 'Warning', 'The contents of RMA will be override!',
+                                  buttons=QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Ok)
+        if res == QMessageBox.StandardButton.Cancel:
+            return
+
+        self.session.query(Rma).filter_by(rma_id=rma_id).update({
+            "date": initDate, "rmaETD": rmaETD, "rmaSrvDate": rmaSrvDate, "componentsSendFlag": componentSend,
+            "componentsRecvFlag": componentRecv, "rmaCompFlag": rmaComp, "rmaReturnFlag": rmaReturn})
+        self.session.commit()
+
+
+    # Information collector
+    # Service provider and Engineer
+    def supporterProcessor(self):
+        self.supporterActionAttached()
+        self.supporterAppearanceAdjust()
+        self.fillSupporterTree()
+
+    def supporterAppearanceAdjust(self):
+        self.pushButton_8.setDisabled(True)
+        self.pushButton_9.setDisabled(True)
+        self.pushButton_10.setDisabled(True)
+        self.pushButton_11.setDisabled(True)
+        self.pushButton_12.setDisabled(True)
+        self.pushButton_13.setDisabled(True)
+
+    def supporterActionAttached(self):
+        self.pushButton_9.clicked.connect(self.addNewSupporter)
+        self.pushButton_12.clicked.connect(self.addNewEngineer)
+        self.treeWidget.clicked.connect(self.fillSupEngInfo)
+        self.pushButton_19.clicked.connect(self.newSupporterTmpl)
+        self.pushButton_24.clicked.connect(self.newEngineerTmpl)
+
+    def fillSupporterTree(self):
+        self.pushButton_9.setDisabled(True)
+        self.pushButton_12.setDisabled(True)
+        res = self.session.query(Supporter.name).all()
+        supportNameList = [i[0] for i in res]
+        self.treeWidget.clear()
+        for supportName in supportNameList:
+            root = QTreeWidgetItem(self.treeWidget)
+            root.setText(0, supportName)
+            supporter = self.session.query(Supporter).filter_by(name=supportName).one()
+            for engineerInstance in supporter.engineers:
+                child = QTreeWidgetItem(root)
+                child.setText(1, engineerInstance.name)
+                # Please pay attention that the type of setText function must be str
+                child.setText(2, str(engineerInstance.id))
+        self.comboBox.clear()
+        nameList = self.session.query(Supporter.name).all()
+        caseIdList = [i[0] for i in nameList]
+        self.comboBox.addItems(caseIdList)
+
+    def addNewSupporter(self):
+        supporterName = self.lineEdit.text()
+        currentDate = str(QDate.currentDate().toPyDate())
+        description = self.plainTextEdit_2.toPlainText()
+        if self.session.query(Supporter).filter_by(name=supporterName).all():
+            QMessageBox.warning(self, 'Warning', 'The supporter name is duplicated!',
+                                      buttons=QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Ok)
+            return
+        if not supporterName:
+            QMessageBox.warning(self, 'Warning', 'Supporter name is mandatory field!')
+            return
+        supporter = Supporter(name=supporterName, date=currentDate, description=description)
+        self.session.add(supporter)
+        self.session.commit()
+        self.fillSupporterTree()
+        self.lineEdit.setText('')
+        self.plainTextEdit_2.setPlainText('')
+
+    def addNewEngineer(self):
+        engineerName = self.lineEdit_2.text()
+        supporterName = self.comboBox.currentText()
+        currentDate = str(QDate.currentDate().toPyDate())
+        description = self.plainTextEdit_3.toPlainText()
+        if not engineerName:
+            QMessageBox.warning(self, 'Warning', 'Engineer name is mandatory field!')
+        parentSupporter = self.session.query(Supporter).filter_by(name=supporterName).one()
+        engineer = Engineer(name=engineerName, date=currentDate, description=description)
+        parentSupporter.engineers.append(engineer)
+        self.session.commit()
+        self.fillSupporterTree()
+        self.lineEdit_2.setText('')
+        self.plainTextEdit_3.setPlainText('')
+
+    def fillSupEngInfo(self):
+        self.pushButton_9.setDisabled(True)
+        self.pushButton_12.setDisabled(True)
+        currentItem = self.treeWidget.currentItem()
+        if currentItem.text(0):
+            # Supporter
+            self.pushButton_8.setDisabled(False)
+            self.pushButton_10.setDisabled(False)
+            self.pushButton_9.setDisabled(True)
+            self.pushButton_11.setDisabled(True)
+            self.pushButton_12.setDisabled(True)
+            self.pushButton_13.setDisabled(True)
+            supporterInstance = self.session.query(Supporter).filter_by(name=currentItem.text(0)).one()
+            self.lineEdit.setText(supporterInstance.name)
+            self.label_26.setText(supporterInstance.date)
+            self.plainTextEdit_2.setPlainText(supporterInstance.description)
+        else:
+            # Engineer
+            self.pushButton_11.setDisabled(False)
+            self.pushButton_13.setDisabled(False)
+            self.pushButton_8.setDisabled(True)
+            self.pushButton_10.setDisabled(True)
+            self.pushButton_9.setDisabled(True)
+            self.pushButton_12.setDisabled(True)
+            engineerInstance = self.session.query(Engineer).filter_by(id=int(currentItem.text(2))).one()
+            self.lineEdit_2.setText(engineerInstance.name)
+            self.label_31.setText(engineerInstance.date)
+            self.plainTextEdit_3.setPlainText(engineerInstance.description)
+            self.comboBox.setCurrentText(engineerInstance.supporter.name)
+
+    def newSupporterTmpl(self):
+        self.pushButton_9.setDisabled(False)
+        self.pushButton_8.setDisabled(True)
+        self.pushButton_10.setDisabled(True)
+        self.lineEdit.setText('')
+        self.label_26.setText('')
+        self.plainTextEdit_2.setPlainText('')
+
+    def newEngineerTmpl(self):
+        self.pushButton_12.setDisabled(False)
+        self.pushButton_11.setDisabled(True)
+        self.pushButton_13.setDisabled(True)
+        self.lineEdit_2.setText('')
+        self.label_31.setText('')
+        self.plainTextEdit_3.setPlainText('')
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
