@@ -8,6 +8,7 @@ from sqlalchemy.orm import *
 from dbmodel import *
 from qdate_selector import *
 from service_selector import *
+from utils import *
 
 
 class Casewindow(QMainWindow, Ui_MainWindow):
@@ -96,9 +97,8 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         self.listWidget.clear()
         self.listWidget.addItems(filling_list)
 
-    def fillCaseInfo(self, event):
-        print(event)
-        case_id = event.data()
+    def fillCaseInfo(self, index):
+        case_id = index.data()
         case = self.session.query(Case).filter_by(case_id=case_id).one()
         self.tabWidget_5.setCurrentIndex(0)
         self.label_55.setText(case.case_id)
@@ -186,6 +186,7 @@ class Casewindow(QMainWindow, Ui_MainWindow):
     def rmaActionAttached(self):
         self.treeWidget_2.clicked.connect(self.fillRmainfo)
         self.treeWidget_2.itemSelectionChanged.connect(self.rmaSelectChangedDetector)
+        self.treeWidget_2.setAnimated(True)
         self.lineEdit_6.installEventFilter(self)
         self.lineEdit_7.installEventFilter(self)
         self.lineEdit_8.installEventFilter(self)
@@ -197,13 +198,17 @@ class Casewindow(QMainWindow, Ui_MainWindow):
 
     def rmaSelectChangedDetector(self):
         # This function is used to track the keyboard operation of arrow up and down. Demo works in Win
-        index = self.listWidget.currentIndex()
-        item = self.listWidget.itemFromIndex(index)
-        self.fillRmainfo()
+        index = self.treeWidget_2.currentIndex()
+        item = self.treeWidget_2.itemFromIndex(index)
+        self.fillRmainfo(index)
 
     def selectServiceInfo(self):
+        try:
+            self.pushButton_6.clicked.disconnect()
+        except:
+            pass
         rmaID = self.label_37.text()
-        dialogBox = serviceSelector(self.session, rmaID)
+        dialogBox = serviceSelector(self.session, rmaID, self)
         dialogBox.exec()
         engineerInfo, contactInfo = dialogBox.scanResult()
         # Below function is used to assess whether the engineers and contacts records of DB need to be updated.
@@ -216,8 +221,6 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         currentEngineerIDList.sort()
         currentContactIDList = [i.id for i in rmaInstance.contacts]
         currentContactIDList.sort()
-        # print(f'engineerIDList: {engineerIDList}, contactIDList: {contactIDList}')
-        # print(f'currentEngineerIDList: {currentEngineerIDList}, currentContactIDList: {currentContactIDList}')
         if dialogBox.result(): # if dialogBox click OK, OK returns 1, cancel returns 0
             if engineerIDList != currentEngineerIDList:
                 rmaInstance.engineers.clear()
@@ -232,11 +235,20 @@ class Casewindow(QMainWindow, Ui_MainWindow):
                     rmaInstance.contacts.append(contactInstance)
                 # Need to add Logger here
             self.session.commit()
+        ##demo code for index
+        index = self.treeWidget_2.currentIndex()
+        self.fillRmainfo(index)
+        self.pushButton_6.clicked.connect(self.selectServiceInfo)
 
     def showServiceInfo(self):
+        try:
+            self.pushButton_7.clicked.disconnect()
+        except:
+            pass
         rmaID = self.label_37.text()
-        dialogBox = serviceSelectorRO(self.session, rmaID)
+        dialogBox = serviceSelectorRO(self.session, rmaID, self)
         dialogBox.exec()
+        self.pushButton_7.clicked.connect(self.showServiceInfo)
 
 
     def fillTree(self):
@@ -250,12 +262,11 @@ class Casewindow(QMainWindow, Ui_MainWindow):
             for rmaInstance in parentCase.rmas:
                 child = QTreeWidgetItem(root)
                 child.setText(1, rmaInstance.rma_id)
-        self.treeWidget_2.topLevelItem(0).setSelected(True)
         self.treeWidget_2.expandAll()
 
-    def fillRmainfo(self):
+    def fillRmainfo(self, index):
         self.comboBox_2.setDisabled(True)
-        currentItem = self.treeWidget_2.currentItem()
+        currentItem = self.treeWidget_2.itemFromIndex(index)
         # If selected item has no column 0
         if not currentItem.text(0):
             # RMA
@@ -267,6 +278,8 @@ class Casewindow(QMainWindow, Ui_MainWindow):
             self.pushButton_16.setDisabled(False)
             self.pushButton_18.setDisabled(False)
             rmaInstance = self.session.query(Rma).filter_by(rma_id=rma_id).one()
+            engineerInfo = engineerInfoGenerator(rmaInstance.engineers)
+            contactInfo = contactInfoGenerator(rmaInstance.contacts)
             # in View tab
             self.rma_dbid = rmaInstance.id
             self.label_35.setText(rmaInstance.case.case_id)
@@ -278,7 +291,9 @@ class Casewindow(QMainWindow, Ui_MainWindow):
             self.checkBox_2.setChecked(rmaInstance.componentsRecvFlag)
             self.checkBox_3.setChecked(rmaInstance.rmaCompFlag)
             self.checkBox_4.setChecked(rmaInstance.rmaReturnFlag)
-            # in edit view
+            self.plainTextEdit.setPlainText(engineerInfo)
+            self.plainTextEdit_2.setPlainText(contactInfo)
+            # in edit/new tab
             res = self.session.query(Case.case_id).all()
             case_id_list = [i[0] for i in res]
             self.comboBox_2.clear()
@@ -291,6 +306,8 @@ class Casewindow(QMainWindow, Ui_MainWindow):
             self.checkBox_7.setChecked(rmaInstance.componentsRecvFlag)
             self.checkBox_8.setChecked(rmaInstance.rmaCompFlag)
             self.checkBox_6.setChecked(rmaInstance.rmaReturnFlag)
+            self.plainTextEdit_4.setPlainText(engineerInfo)
+            self.plainTextEdit_5.setPlainText(contactInfo)
         else:
             # Clicked a case instead of RMA
             self.pushButton_7.setDisabled(True)
@@ -308,6 +325,8 @@ class Casewindow(QMainWindow, Ui_MainWindow):
             self.checkBox_2.setChecked(False)
             self.checkBox_3.setChecked(False)
             self.checkBox_4.setChecked(False)
+            self.plainTextEdit.setPlainText('')
+            self.plainTextEdit_2.setPlainText('')
 
             self.comboBox_2.clear()
             self.lineEdit_4.setText('')
@@ -318,6 +337,8 @@ class Casewindow(QMainWindow, Ui_MainWindow):
             self.checkBox_7.setChecked(False)
             self.checkBox_8.setChecked(False)
             self.checkBox_6.setChecked(False)
+            self.plainTextEdit_4.setPlainText('')
+            self.plainTextEdit_5.setPlainText('')
 
     def rmaInitDate(self):
         dialogBox = dateSelector()
@@ -384,6 +405,7 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         parentCase.rmas.append(rma)
         self.session.commit()
         self.fillTree()
+        self.rmaAppearanceAdjust()
 
     def updateRma(self):
         # This function is used to update a rma information
@@ -483,6 +505,7 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         self.fillSupporterTree()
         self.lineEdit.setText('')
         self.plainTextEdit_90.setPlainText('')
+        self.supporterAppearanceAdjust()
 
     def addNewEngineer(self):
         engineerName = self.lineEdit_2.text()
@@ -499,6 +522,7 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         self.fillSupporterTree()
         self.lineEdit_2.setText('')
         self.plainTextEdit_3.setPlainText('')
+        self.supporterAppearanceAdjust()
 
     def fillSupEngInfo(self, itemIndex):
         self.pushButton_9.setDisabled(True)
@@ -568,7 +592,7 @@ class Casewindow(QMainWindow, Ui_MainWindow):
                 "name": engineerName, "description": engineerDesc
             })
             self.session.commit()
-            self.fillSupporterTree()
+
 
     def updateSupporter(self):
         currentSupporter = self.treeWidget.currentItem()
@@ -587,7 +611,7 @@ class Casewindow(QMainWindow, Ui_MainWindow):
                 "name": supporterName, "description": supporterDesc
             })
             self.session.commit()
-            self.fillSupporterTree()
+
 
     # Customer and Contacts
     def customerProcessor(self):
@@ -657,6 +681,7 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         self.fillCustomerTree()
         self.lineEdit_3.setText('')
         self.plainTextEdit_91.setPlainText('')
+        self.customerAppearanceAdjust()
 
 
     def addNewContact(self):
@@ -674,6 +699,8 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         self.fillCustomerTree()
         self.lineEdit_5.setText('')
         self.plainTextEdit_3.setPlainText('')
+        self.customerAppearanceAdjust()
+
 
     def fillCusConInfo(self, itemIndex):
         self.pushButton_30.setDisabled(True)
@@ -741,7 +768,7 @@ class Casewindow(QMainWindow, Ui_MainWindow):
                 "name": customerName, "description": description
             })
             self.session.commit()
-        self.fillCustomerTree()
+
 
     def updateContact(self):
         currentContact = self.treeWidget_3.currentItem()
@@ -760,7 +787,8 @@ class Casewindow(QMainWindow, Ui_MainWindow):
                 "name": contactName, "description": description
             })
             self.session.commit()
-        self.fillCustomerTree()
+
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

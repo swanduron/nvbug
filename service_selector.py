@@ -7,7 +7,7 @@ from dbmodel import *
 class serviceSelector(QDialog):
 
     def __init__(self, dbcursor, rmaID, parent=None):
-        super(serviceSelector, self).__init__(parent)
+        super().__init__(parent)
         self.dbcursor = dbcursor
         self.rmaID = rmaID
         self.setupUi()
@@ -86,7 +86,7 @@ class serviceSelector(QDialog):
 class serviceSelectorRO(QDialog):
 
     def __init__(self, dbcursor, rmaID, parent=None):
-        super(serviceSelectorRO, self).__init__(parent)
+        super().__init__(parent)
         self.dbcursor = dbcursor
         self.rmaID = rmaID
         self.setupUi()
