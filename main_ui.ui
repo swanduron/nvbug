@@ -55,7 +55,7 @@
        </font>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -229,7 +229,7 @@
         <item>
          <widget class="QTabWidget" name="tabWidget_5">
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tab_3">
            <attribute name="title">
@@ -409,7 +409,7 @@
         <item>
          <widget class="QTabWidget" name="tabWidget_4">
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="tab_12">
            <attribute name="title">
@@ -418,31 +418,10 @@
            <layout class="QVBoxLayout" name="verticalLayout_16">
             <item>
              <layout class="QGridLayout" name="gridLayout_3">
-              <item row="0" column="0">
-               <widget class="QLabel" name="label_34">
-                <property name="text">
-                 <string>Case ID:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QLabel" name="label_35">
-                <property name="text">
-                 <string/>
-                </property>
-               </widget>
-              </item>
               <item row="1" column="0">
                <widget class="QLabel" name="label_36">
                 <property name="text">
                  <string>RMA ID:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QLabel" name="label_37">
-                <property name="text">
-                 <string/>
                 </property>
                </widget>
               </item>
@@ -453,17 +432,51 @@
                 </property>
                </widget>
               </item>
-              <item row="2" column="1">
-               <widget class="QLabel" name="label_39">
+              <item row="1" column="1">
+               <widget class="QLabel" name="label_37">
                 <property name="text">
                  <string/>
                 </property>
                </widget>
               </item>
-              <item row="3" column="0">
-               <widget class="QLabel" name="label_40">
+              <item row="3" column="2">
+               <widget class="QCheckBox" name="checkBox_3">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="text">
-                 <string>RMA init Date:</string>
+                 <string>RmaComp</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_34">
+                <property name="text">
+                 <string>Case ID:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="1">
+               <widget class="QLabel" name="label_45">
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="2">
+               <widget class="QCheckBox" name="checkBox_2">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>ComponentRecv</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLabel" name="label_35">
+                <property name="text">
+                 <string/>
                 </property>
                </widget>
               </item>
@@ -474,10 +487,13 @@
                 </property>
                </widget>
               </item>
-              <item row="4" column="0">
-               <widget class="QLabel" name="label_42">
+              <item row="1" column="2">
+               <widget class="QCheckBox" name="checkBox">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="text">
-                 <string>RMA EDT:</string>
+                 <string>ComponentSend</string>
                 </property>
                </widget>
               </item>
@@ -495,43 +511,6 @@
                 </property>
                </widget>
               </item>
-              <item row="5" column="1">
-               <widget class="QLabel" name="label_45">
-                <property name="text">
-                 <string/>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="2">
-               <widget class="QCheckBox" name="checkBox">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="text">
-                 <string>ComponentSend</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="2">
-               <widget class="QCheckBox" name="checkBox_2">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="text">
-                 <string>ComponentRecv</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="2">
-               <widget class="QCheckBox" name="checkBox_3">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="text">
-                 <string>RmaComp</string>
-                </property>
-               </widget>
-              </item>
               <item row="4" column="2">
                <widget class="QCheckBox" name="checkBox_4">
                 <property name="enabled">
@@ -542,12 +521,40 @@
                 </property>
                </widget>
               </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="label_42">
+                <property name="text">
+                 <string>RMA EDT:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_40">
+                <property name="text">
+                 <string>RMA init Date:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QPushButton" name="pushButton_7">
+                <property name="text">
+                 <string>Service Info</string>
+                </property>
+               </widget>
+              </item>
              </layout>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_32">
+              <property name="text">
+               <string>Show Log</string>
+              </property>
+             </widget>
             </item>
             <item>
              <widget class="QLabel" name="label_46">
               <property name="text">
-               <string>RMA target:</string>
+               <string>Customer Contacts:</string>
               </property>
              </widget>
             </item>
@@ -557,7 +564,7 @@
             <item>
              <widget class="QLabel" name="label_47">
               <property name="text">
-               <string>RMA provider:</string>
+               <string>Onsite Engineers:</string>
               </property>
              </widget>
             </item>
@@ -677,7 +684,7 @@
             <item>
              <widget class="QLabel" name="label_49">
               <property name="text">
-               <string>RMA target:</string>
+               <string>Customer Contacts:</string>
               </property>
              </widget>
             </item>
@@ -687,7 +694,7 @@
             <item>
              <widget class="QLabel" name="label_51">
               <property name="text">
-               <string>RMA provider:</string>
+               <string>Onsite Engineers:</string>
               </property>
              </widget>
             </item>
@@ -752,7 +759,7 @@
         <item>
          <widget class="QTabWidget" name="tabWidget_2">
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="tab_8">
            <attribute name="title">
@@ -785,7 +792,7 @@
                 </column>
                 <column>
                  <property name="text">
-                  <string>eng_id</string>
+                  <string>id</string>
                  </property>
                 </column>
                </widget>
@@ -795,7 +802,7 @@
             <item>
              <widget class="QTabWidget" name="tabWidget_3">
               <property name="currentIndex">
-               <number>0</number>
+               <number>1</number>
               </property>
               <widget class="QWidget" name="tab_9">
                <attribute name="title">
@@ -842,7 +849,7 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QPlainTextEdit" name="plainTextEdit_2"/>
+                 <widget class="QPlainTextEdit" name="plainTextEdit_90"/>
                 </item>
                 <item>
                  <layout class="QHBoxLayout" name="horizontalLayout_7">
@@ -977,14 +984,232 @@
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="tab_7">
-           <attribute name="title">
-            <string>Components</string>
-           </attribute>
-          </widget>
           <widget class="QWidget" name="tab_11">
            <attribute name="title">
             <string>Contacts</string>
+           </attribute>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <layout class="QVBoxLayout" name="verticalLayout_11">
+              <item>
+               <widget class="QLabel" name="label_62">
+                <property name="text">
+                 <string>Contact List</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QTreeWidget" name="treeWidget_3">
+                <column>
+                 <property name="text">
+                  <string>Customer</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>Contact Name</string>
+                 </property>
+                </column>
+                <column>
+                 <property name="text">
+                  <string>id</string>
+                 </property>
+                </column>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QTabWidget" name="tabWidget_6">
+              <property name="currentIndex">
+               <number>1</number>
+              </property>
+              <widget class="QWidget" name="tab_14">
+               <attribute name="title">
+                <string>Customer</string>
+               </attribute>
+               <layout class="QVBoxLayout" name="verticalLayout_14">
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_18">
+                  <item>
+                   <widget class="QLabel" name="label_64">
+                    <property name="text">
+                     <string>Customer Name:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLineEdit" name="lineEdit_3"/>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_19">
+                  <item>
+                   <widget class="QLabel" name="label_66">
+                    <property name="text">
+                     <string>Added Date:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_67">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_68">
+                  <property name="text">
+                   <string>Description</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPlainTextEdit" name="plainTextEdit_91"/>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_21">
+                  <item>
+                   <widget class="QPushButton" name="pushButton_17">
+                    <property name="text">
+                     <string>Update</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="pushButton_25">
+                    <property name="text">
+                     <string>New</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="pushButton_26">
+                    <property name="text">
+                     <string>Add</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="pushButton_27">
+                    <property name="text">
+                     <string>Delete</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="tab_15">
+               <attribute name="title">
+                <string>Contacts</string>
+               </attribute>
+               <layout class="QVBoxLayout" name="verticalLayout_17">
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_22">
+                  <item>
+                   <widget class="QLabel" name="label_69">
+                    <property name="text">
+                     <string>Contact Name:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLineEdit" name="lineEdit_5"/>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_23">
+                  <item>
+                   <widget class="QLabel" name="label_70">
+                    <property name="text">
+                     <string>Customer Name</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="comboBox_3"/>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_24">
+                  <item>
+                   <widget class="QLabel" name="label_71">
+                    <property name="text">
+                     <string>Added Date:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_72">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_73">
+                  <property name="text">
+                   <string>Description:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPlainTextEdit" name="plainTextEdit_8"/>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_25">
+                  <item>
+                   <widget class="QPushButton" name="pushButton_28">
+                    <property name="text">
+                     <string>Update</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="pushButton_29">
+                    <property name="text">
+                     <string>New</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="pushButton_30">
+                    <property name="text">
+                     <string>Add</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="pushButton_31">
+                    <property name="text">
+                     <string>Delete</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="tab_7">
+           <attribute name="title">
+            <string>Components</string>
            </attribute>
           </widget>
          </widget>
