@@ -20,7 +20,7 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         self.DBSession = sessionmaker(bind=self.engine)
         self.session = self.DBSession()
         self.pushButton.clicked.connect(self.page1)
-        self.pushButton_2.clicked.connect(self.page2)
+        # self.pushButton_2.clicked.connect(self.page2)
         self.pushButton_3.clicked.connect(self.page3)
         self.pushButton_4.clicked.connect(self.page4)
         self.tabWidget.tabBar().hide()
@@ -29,14 +29,11 @@ class Casewindow(QMainWindow, Ui_MainWindow):
     def page1(self):
         self.tabWidget.setCurrentIndex(0)
 
-    def page2(self):
-        self.tabWidget.setCurrentIndex(1)
-        self.caseListProcessor()
     def page3(self):
-        self.tabWidget.setCurrentIndex(2)
+        self.tabWidget.setCurrentIndex(1)
         self.rmaTreeProcessor()
     def page4(self):
-        self.tabWidget.setCurrentIndex(3)
+        self.tabWidget.setCurrentIndex(2)
         self.supporterProcessor()
         self.customerProcessor()
 
@@ -60,14 +57,25 @@ class Casewindow(QMainWindow, Ui_MainWindow):
                     self.rmaSrvDate()
         return super(Casewindow, self).eventFilter(a0, a1)
 
+    # RMA operation
 
-    # CaseList operation
-    def caseListProcessor(self):
-        self.fillCaseList()
-        self.listActionAttached()
-        self.caseListAppearanceAdject()
 
-    def caseListAppearanceAdject(self):
+    def rmaTreeProcessor(self):
+        self.fillTree()
+        self.rmaActionAttached()
+        self.rmaAppearanceAdjust()
+
+    def rmaAppearanceAdjust(self):
+        self.lineEdit_6.setInputMask('0000-00-00')
+        self.lineEdit_7.setInputMask('0000-00-00')
+        self.lineEdit_8.setInputMask('0000-00-00')
+        self.pushButton_14.setDisabled(True)
+        self.pushButton_15.setDisabled(True)
+        self.pushButton_16.setDisabled(True)
+        self.pushButton_6.setDisabled(True)
+        # change treeWidget colume width
+        self.treeWidget_2.setColumnWidth(0, 150)
+
         self.pushButton_20.setDisabled(True)
         self.pushButton_22.setDisabled(True)
         self.pushButton_23.setDisabled(True)
@@ -76,43 +84,22 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         self.lineEdit_10.setDisabled(True)
         self.lineEdit_10.setInputMask('0000-00-00')
 
-    def listActionAttached(self):
-        self.listWidget.clicked.connect(self.fillCaseInfo)
-        self.listWidget.itemSelectionChanged.connect(self.caseSelectChangedDetector)
-        self.pushButton_21.clicked.connect(self.createBlankCaseTmpl)
+    def rmaActionAttached(self):
+        self.treeWidget_2.clicked.connect(self.fillRmainfo)
+        self.treeWidget_2.itemSelectionChanged.connect(self.rmaSelectChangedDetector)
+        self.treeWidget_2.setAnimated(True)
+        self.lineEdit_6.installEventFilter(self)
+        self.lineEdit_7.installEventFilter(self)
+        self.lineEdit_8.installEventFilter(self)
+        self.pushButton_18.clicked.connect(self.createBlankRma)
+        self.pushButton_15.clicked.connect(self.saveNewRma)
+        self.pushButton_14.clicked.connect(self.updateRma)
+        self.pushButton_6.clicked.connect(self.selectServiceInfo)
+
         self.pushButton_20.clicked.connect(self.saveCaseDescChanges)
+        self.pushButton_21.clicked.connect(self.createBlankCaseTmpl)
         self.pushButton_22.clicked.connect(self.addNewCase)
         self.lineEdit_10.installEventFilter(self)
-
-    def caseSelectChangedDetector(self):
-        # This function is used to track the keyboard operation of arrow up and down. Demo works in Win
-        index = self.listWidget.currentIndex()
-        item = self.listWidget.itemFromIndex(index)
-        self.fillCaseInfo(index)
-        # print(f'Item changed!, Current Item is {item.text()}')
-
-    def fillCaseList(self):
-        res = self.session.query(Case.case_id).order_by(desc(Case.date)).all()
-        filling_list = [i[0] for i in res]
-        self.listWidget.clear()
-        self.listWidget.addItems(filling_list)
-
-    def fillCaseInfo(self, index):
-        case_id = index.data()
-        case = self.session.query(Case).filter_by(case_id=case_id).one()
-        self.tabWidget_5.setCurrentIndex(0)
-        self.label_55.setText(case.case_id)
-        self.label_59.setText(case.date)
-        self.plainTextEdit_6.setPlainText(case.description)
-        self.lineEdit_9.setText(case.case_id)
-        self.lineEdit_9.setDisabled(True)
-        self.lineEdit_10.setText(case.date)
-        self.lineEdit_10.setDisabled(True)
-        self.plainTextEdit_7.setPlainText(case.description)
-        self.pushButton_20.setDisabled(False)
-        self.pushButton_23.setDisabled(False)
-        self.pushButton_21.setDisabled(False)
-
 
     def createBlankCaseTmpl(self):
         self.pushButton_20.setDisabled(True)
@@ -123,19 +110,6 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         self.lineEdit_10.setDisabled(False)
         self.lineEdit_10.setText('')
         self.plainTextEdit_7.setPlainText('')
-
-    def saveCaseDescChanges(self):
-
-        case_id = self.listWidget.currentItem().text()
-        case = self.session.query(Case).filter_by(case_id=case_id).one()
-        currentCaseDesc = self.plainTextEdit_7.toPlainText()
-        if currentCaseDesc != case.description:
-            res = QMessageBox.warning(self, 'Warning', 'The description of case will be override!',
-                                      buttons=QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Ok)
-            if res == QMessageBox.StandardButton.Cancel:
-                return
-            self.session.query(Case).filter_by(case_id=case_id).update({"description": currentCaseDesc})
-            self.session.commit()
 
     def addNewCase(self):
         addDate = self.lineEdit_10.text()
@@ -153,8 +127,8 @@ class Casewindow(QMainWindow, Ui_MainWindow):
             case = Case(case_id=case_id, date=addDate, description=description)
             self.session.add(case)
             self.session.commit()
-            self.fillCaseList()
-            self.caseListAppearanceAdject()
+            self.fillTree()
+            self.rmaAppearanceAdjust()
 
     def caseInputData(self):
         dialogBox = dateSelector()
@@ -163,38 +137,20 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         if dialogBox.result():
             self.lineEdit_10.setText(str(selectedDate))
 
-    # RMA operation
 
+    def saveCaseDescChanges(self):
 
-    def rmaTreeProcessor(self):
-        self.fillTree()
-        self.rmaActionAttached()
-        self.rmaAppearanceAdjust()
+        case_DBid = int(self.treeWidget_2.currentItem().text(2))
+        caseInstance = self.session.query(Case).filter_by(id=case_DBid).one()
+        currentCaseDesc = self.plainTextEdit_7.toPlainText()
+        if currentCaseDesc != caseInstance.description:
+            res = QMessageBox.warning(self, 'Warning', 'The description of case will be override!',
+                                      buttons=QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Ok)
+            if res == QMessageBox.StandardButton.Cancel:
+                return
+            self.session.query(Case).filter_by(id=case_DBid).update({"description": currentCaseDesc})
+            self.session.commit()
 
-    def rmaAppearanceAdjust(self):
-        self.lineEdit_6.setInputMask('0000-00-00')
-        self.lineEdit_7.setInputMask('0000-00-00')
-        self.lineEdit_8.setInputMask('0000-00-00')
-        self.pushButton_14.setDisabled(True)
-        self.pushButton_15.setDisabled(True)
-        self.pushButton_16.setDisabled(True)
-        self.pushButton_7.setDisabled(True)
-        self.pushButton_6.setDisabled(True)
-        # change treeWidget colume width
-        self.treeWidget_2.setColumnWidth(0, 150)
-
-    def rmaActionAttached(self):
-        self.treeWidget_2.clicked.connect(self.fillRmainfo)
-        self.treeWidget_2.itemSelectionChanged.connect(self.rmaSelectChangedDetector)
-        self.treeWidget_2.setAnimated(True)
-        self.lineEdit_6.installEventFilter(self)
-        self.lineEdit_7.installEventFilter(self)
-        self.lineEdit_8.installEventFilter(self)
-        self.pushButton_18.clicked.connect(self.createBlankRma)
-        self.pushButton_15.clicked.connect(self.saveNewRma)
-        self.pushButton_14.clicked.connect(self.updateRma)
-        self.pushButton_6.clicked.connect(self.selectServiceInfo)
-        self.pushButton_7.clicked.connect(self.showServiceInfo)
 
     def rmaSelectChangedDetector(self):
         # This function is used to track the keyboard operation of arrow up and down. Demo works in Win
@@ -203,11 +159,12 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         self.fillRmainfo(index)
 
     def selectServiceInfo(self):
+        # To avoid double-fired issue during button clicked
         try:
             self.pushButton_6.clicked.disconnect()
         except:
             pass
-        rmaID = self.label_37.text()
+        rmaID = self.lineEdit_4.text()
         dialogBox = serviceSelector(self.session, rmaID, self)
         dialogBox.exec()
         engineerInfo, contactInfo = dialogBox.scanResult()
@@ -240,28 +197,22 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         self.fillRmainfo(index)
         self.pushButton_6.clicked.connect(self.selectServiceInfo)
 
-    def showServiceInfo(self):
-        try:
-            self.pushButton_7.clicked.disconnect()
-        except:
-            pass
-        rmaID = self.label_37.text()
-        dialogBox = serviceSelectorRO(self.session, rmaID, self)
-        dialogBox.exec()
-        self.pushButton_7.clicked.connect(self.showServiceInfo)
+
 
 
     def fillTree(self):
-        res = self.session.query(Case.case_id).order_by(desc(Case.date)).all()
-        case_id_list = [i[0] for i in res]
+        caseInstacneList = self.session.query(Case).order_by(desc(Case.date)).all()
+        # case_id_list = [i[0] for i in res]
         self.treeWidget_2.clear()
-        for case_id in case_id_list:
+        for caseInstance in caseInstacneList:
             root = QTreeWidgetItem(self.treeWidget_2)
-            root.setText(0, case_id)
-            parentCase = self.session.query(Case).filter_by(case_id=case_id).one()
-            for rmaInstance in parentCase.rmas:
+            root.setText(0, caseInstance.case_id)
+            root.setText(2, str(caseInstance.id))
+            # parentCase = self.session.query(Case).filter_by(case_id=case_id).one()
+            for rmaInstance in caseInstance.rmas:
                 child = QTreeWidgetItem(root)
                 child.setText(1, rmaInstance.rma_id)
+                child.setText(2, str(rmaInstance.id))
         self.treeWidget_2.expandAll()
 
     def fillRmainfo(self, index):
@@ -270,9 +221,7 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         # If selected item has no column 0
         if not currentItem.text(0):
             # RMA
-            self.pushButton_7.setDisabled(False)
             self.pushButton_6.setDisabled(False)
-            self.tabWidget_4.setCurrentIndex(0)
             rma_id = currentItem.text(1)
             self.pushButton_14.setDisabled(False)
             self.pushButton_16.setDisabled(False)
@@ -280,20 +229,9 @@ class Casewindow(QMainWindow, Ui_MainWindow):
             rmaInstance = self.session.query(Rma).filter_by(rma_id=rma_id).one()
             engineerInfo = engineerInfoGenerator(rmaInstance.engineers)
             contactInfo = contactInfoGenerator(rmaInstance.contacts)
-            # in View tab
-            self.rma_dbid = rmaInstance.id
-            self.label_35.setText(rmaInstance.case.case_id)
-            self.label_37.setText(rma_id)
-            self.label_41.setText(rmaInstance.date)
-            self.label_43.setText(rmaInstance.rmaETD)
-            self.label_45.setText(rmaInstance.rmaSrvDate)
-            self.checkBox.setChecked(rmaInstance.componentsSendFlag)
-            self.checkBox_2.setChecked(rmaInstance.componentsRecvFlag)
-            self.checkBox_3.setChecked(rmaInstance.rmaCompFlag)
-            self.checkBox_4.setChecked(rmaInstance.rmaReturnFlag)
-            self.plainTextEdit.setPlainText(engineerInfo)
-            self.plainTextEdit_2.setPlainText(contactInfo)
+
             # in edit/new tab
+            self.tabWidget_4.setCurrentIndex(1)
             res = self.session.query(Case.case_id).all()
             case_id_list = [i[0] for i in res]
             self.comboBox_2.clear()
@@ -308,25 +246,19 @@ class Casewindow(QMainWindow, Ui_MainWindow):
             self.checkBox_6.setChecked(rmaInstance.rmaReturnFlag)
             self.plainTextEdit_4.setPlainText(engineerInfo)
             self.plainTextEdit_5.setPlainText(contactInfo)
+            # Clear case tab
+            self.lineEdit_9.setText('')
+            self.lineEdit_10.setText('')
+            self.plainTextEdit_7.setPlainText('')
+            self.pushButton_20.setDisabled(True)
+            self.pushButton_23.setDisabled(True)
         else:
             # Clicked a case instead of RMA
-            self.pushButton_7.setDisabled(True)
-            self.pushButton_6.setDisabled(True)
             self.tabWidget_4.setCurrentIndex(0)
+            self.pushButton_6.setDisabled(True)
             self.pushButton_14.setDisabled(True)
             self.pushButton_16.setDisabled(True)
             self.pushButton_18.setDisabled(False)
-            self.label_35.setText('')
-            self.label_37.setText('')
-            self.label_41.setText('')
-            self.label_43.setText('')
-            self.label_45.setText('')
-            self.checkBox.setChecked(False)
-            self.checkBox_2.setChecked(False)
-            self.checkBox_3.setChecked(False)
-            self.checkBox_4.setChecked(False)
-            self.plainTextEdit.setPlainText('')
-            self.plainTextEdit_2.setPlainText('')
 
             self.comboBox_2.clear()
             self.lineEdit_4.setText('')
@@ -339,6 +271,15 @@ class Casewindow(QMainWindow, Ui_MainWindow):
             self.checkBox_6.setChecked(False)
             self.plainTextEdit_4.setPlainText('')
             self.plainTextEdit_5.setPlainText('')
+
+            # Fill case information
+            case_DBid = int(currentItem.text(2))
+            caseInstance = self.session.query(Case).filter_by(id=case_DBid).one()
+            self.lineEdit_9.setText(caseInstance.case_id)
+            self.lineEdit_10.setText(caseInstance.date)
+            self.plainTextEdit_7.setPlainText(caseInstance.description)
+            self.pushButton_20.setDisabled(False)
+            self.pushButton_23.setDisabled(False)
 
     def rmaInitDate(self):
         dialogBox = dateSelector()
@@ -787,7 +728,6 @@ class Casewindow(QMainWindow, Ui_MainWindow):
                 "name": contactName, "description": description
             })
             self.session.commit()
-
 
 
 if __name__ == '__main__':
