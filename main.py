@@ -98,7 +98,9 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         self.pushButton_6.setDisabled(True)
         # change treeWidget colume width
         self.treeWidget_2.setColumnWidth(0, 150)
+        self.treeWidget_2.setColumnHidden(2, True)
         self.checkBox.setDisabled(True)
+        self.pushButton_5.setDisabled(True)
 
         self.pushButton_20.setDisabled(True)
         self.pushButton_22.setDisabled(True)
@@ -124,6 +126,25 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         self.pushButton_21.clicked.connect(self.createBlankCaseTmpl)
         self.pushButton_22.clicked.connect(self.addNewCase)
         self.lineEdit_10.installEventFilter(self)
+
+        self.pushButton_5.clicked.connect(self.takeLog)
+
+    def takeLog(self):
+        try:
+            self.pushButton_5.disconnect()
+        except:
+            pass
+        rmaID = self.lineEdit_4.text()
+        dialogBox = textSelector()
+        dialogBox.exec()
+        rmaInstance = self.session.query(Rma).filter_by(rma_id=rmaID).one()
+        if dialogBox.result():
+            currentDate = str(QDate.currentDate().toPyDate())
+            logText = dialogBox.getText()
+            logInstance = logInfo(content=logText, date=currentDate)
+            rmaInstance.logs.append(logInstance)
+            self.session.commit()
+        self.pushButton_5.clicked.connect(self.takeLog)
 
     def createBlankCaseTmpl(self):
         self.pushButton_20.setDisabled(True)
@@ -266,7 +287,7 @@ class Casewindow(QMainWindow, Ui_MainWindow):
 
             # in edit/new tab
             self.tabWidget_4.setCurrentIndex(1)
-            res = self.session.query(Case.case_id).all()
+            res = self.session.query(Case.case_id).filter_by(caseCompFlag=False).order_by(desc(Case.date)).all()
             case_id_list = [i[0] for i in res]
             self.comboBox_2.clear()
             self.comboBox_2.addItems(case_id_list)
@@ -287,6 +308,7 @@ class Casewindow(QMainWindow, Ui_MainWindow):
             self.plainTextEdit_7.setPlainText('')
             self.pushButton_20.setDisabled(True)
             self.pushButton_23.setDisabled(True)
+            self.pushButton_5.setDisabled(False)
         else:
             # Clicked a case instead of RMA
             self.tabWidget_4.setCurrentIndex(0)
@@ -294,6 +316,7 @@ class Casewindow(QMainWindow, Ui_MainWindow):
             self.pushButton_14.setDisabled(True)
             self.pushButton_16.setDisabled(True)
             self.pushButton_18.setDisabled(False)
+            self.pushButton_5.setDisabled(True)
 
             self.comboBox_2.clear()
             self.lineEdit_4.setText('')
@@ -344,7 +367,7 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         self.pushButton_15.setDisabled(False)
         self.pushButton_14.setDisabled(True)
         self.pushButton_16.setDisabled(True)
-        res = self.session.query(Case.case_id).all()
+        res = self.session.query(Case.case_id).filter_by(caseCompFlag=False).order_by(desc(Case.date)).all()
         case_id_list = [i[0] for i in res]
         self.comboBox_2.clear()
         self.comboBox_2.addItems(case_id_list)
