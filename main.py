@@ -28,6 +28,7 @@ class Casewindow(QMainWindow, Ui_MainWindow):
 
     def page1(self):
         self.tabWidget.setCurrentIndex(0)
+        self.dashboardProcessor()
 
     def page3(self):
         self.tabWidget.setCurrentIndex(1)
@@ -57,6 +58,28 @@ class Casewindow(QMainWindow, Ui_MainWindow):
                     self.rmaSrvDate()
         return super(Casewindow, self).eventFilter(a0, a1)
 
+    #Dash board processor
+    def dashboardProcessor(self):
+        self.dashboardActionAttached()
+        self.dashboardAppearanceAdjust()
+        self.fillDashboard()
+
+    def dashboardAppearanceAdjust(self):
+        pass
+
+    def dashboardActionAttached(self):
+        pass
+
+    def fillDashboard(self):
+        liveCaseNumber = str(len(self.session.query(Case).filter_by(caseCompFlag=False).all()))
+        liveRmaNumber = str(len(self.session.query(Rma).filter_by(rmaCompleteFlag=False).all()))
+        oldestCase = self.session.query(Case).filter_by(caseCompFlag=False).order_by(desc(Case.date)).all()[-1]
+        oldestRma = self.session.query(Rma).filter_by(rmaCompleteFlag=False).order_by(desc(Rma.date)).all()[-1]
+        self.label_2.setText(liveCaseNumber)
+        self.label_4.setText(liveRmaNumber)
+        self.label_6.setText(oldestCase.case_id)
+        self.label_8.setText(oldestRma.rma_id)
+
     # RMA operation
 
 
@@ -75,6 +98,7 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         self.pushButton_6.setDisabled(True)
         # change treeWidget colume width
         self.treeWidget_2.setColumnWidth(0, 150)
+        self.checkBox.setDisabled(True)
 
         self.pushButton_20.setDisabled(True)
         self.pushButton_22.setDisabled(True)
@@ -112,6 +136,10 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         self.plainTextEdit_7.setPlainText('')
 
     def addNewCase(self):
+        try:
+            self.pushButton_22.disconnect()
+        except:
+            pass
         addDate = self.lineEdit_10.text()
         case_id = self.lineEdit_9.text()
         description = self.plainTextEdit_7.toPlainText()
@@ -129,6 +157,7 @@ class Casewindow(QMainWindow, Ui_MainWindow):
             self.session.commit()
             self.fillTree()
             self.rmaAppearanceAdjust()
+        self.pushButton_22.clicked.connect(self.addNewCase)
 
     def caseInputData(self):
         dialogBox = dateSelector()
@@ -139,17 +168,22 @@ class Casewindow(QMainWindow, Ui_MainWindow):
 
 
     def saveCaseDescChanges(self):
-
+        try:
+            self.pushButton_20.disconnect()
+        except:
+            pass
         case_DBid = int(self.treeWidget_2.currentItem().text(2))
-        caseInstance = self.session.query(Case).filter_by(id=case_DBid).one()
         currentCaseDesc = self.plainTextEdit_7.toPlainText()
-        if currentCaseDesc != caseInstance.description:
-            res = QMessageBox.warning(self, 'Warning', 'The description of case will be override!',
-                                      buttons=QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Ok)
-            if res == QMessageBox.StandardButton.Cancel:
-                return
-            self.session.query(Case).filter_by(id=case_DBid).update({"description": currentCaseDesc})
-            self.session.commit()
+        caseCompFlag = True if self.checkBox.checkState() == Qt.CheckState.Checked else False
+        res = QMessageBox.warning(self, 'Warning', 'The information of case will be override!',
+                                  buttons=QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Ok)
+        if res == QMessageBox.StandardButton.Cancel:
+            return
+        self.session.query(Case).filter_by(id=case_DBid).update({
+            "description": currentCaseDesc,
+            "caseCompFlag": caseCompFlag})
+        self.session.commit()
+        self.pushButton_20.clicked.connect(self.saveCaseDescChanges)
 
 
     def rmaSelectChangedDetector(self):
@@ -201,14 +235,13 @@ class Casewindow(QMainWindow, Ui_MainWindow):
 
 
     def fillTree(self):
-        caseInstacneList = self.session.query(Case).order_by(desc(Case.date)).all()
+        caseInstacneList = self.session.query(Case).order_by(Case.caseCompFlag, desc(Case.date)).all()
         # case_id_list = [i[0] for i in res]
         self.treeWidget_2.clear()
         for caseInstance in caseInstacneList:
             root = QTreeWidgetItem(self.treeWidget_2)
             root.setText(0, caseInstance.case_id)
             root.setText(2, str(caseInstance.id))
-            # parentCase = self.session.query(Case).filter_by(case_id=case_id).one()
             for rmaInstance in caseInstance.rmas:
                 child = QTreeWidgetItem(root)
                 child.setText(1, rmaInstance.rma_id)
@@ -226,6 +259,7 @@ class Casewindow(QMainWindow, Ui_MainWindow):
             self.pushButton_14.setDisabled(False)
             self.pushButton_16.setDisabled(False)
             self.pushButton_18.setDisabled(False)
+            self.checkBox.setDisabled(True)
             rmaInstance = self.session.query(Rma).filter_by(rma_id=rma_id).one()
             engineerInfo = engineerInfoGenerator(rmaInstance.engineers)
             contactInfo = contactInfoGenerator(rmaInstance.contacts)
@@ -244,6 +278,7 @@ class Casewindow(QMainWindow, Ui_MainWindow):
             self.checkBox_7.setChecked(rmaInstance.componentsRecvFlag)
             self.checkBox_8.setChecked(rmaInstance.rmaCompFlag)
             self.checkBox_6.setChecked(rmaInstance.rmaReturnFlag)
+            self.checkBox_2.setChecked(rmaInstance.rmaCompleteFlag)
             self.plainTextEdit_4.setPlainText(engineerInfo)
             self.plainTextEdit_5.setPlainText(contactInfo)
             # Clear case tab
@@ -273,11 +308,13 @@ class Casewindow(QMainWindow, Ui_MainWindow):
             self.plainTextEdit_5.setPlainText('')
 
             # Fill case information
+            self.checkBox.setDisabled(False)
             case_DBid = int(currentItem.text(2))
             caseInstance = self.session.query(Case).filter_by(id=case_DBid).one()
             self.lineEdit_9.setText(caseInstance.case_id)
             self.lineEdit_10.setText(caseInstance.date)
             self.plainTextEdit_7.setPlainText(caseInstance.description)
+            self.checkBox.setChecked(caseInstance.caseCompFlag)
             self.pushButton_20.setDisabled(False)
             self.pushButton_23.setDisabled(False)
 
@@ -322,6 +359,10 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         self.checkBox_6.setChecked(False)
 
     def saveNewRma(self):
+        try:
+            self.pushButton_15.disconnect()
+        except:
+            pass
         rma_id = self.lineEdit_4.text()
         rmaDup = self.session.query(Rma).filter_by(rma_id=rma_id).all()
         if rmaDup:
@@ -347,8 +388,13 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         self.session.commit()
         self.fillTree()
         self.rmaAppearanceAdjust()
+        self.pushButton_15.clicked.connect(self.saveNewRma)
 
     def updateRma(self):
+        try:
+            self.pushButton_14.disconnect()
+        except:
+            pass
         # This function is used to update a rma information
         rma_id = self.lineEdit_4.text()
         initDate = self.lineEdit_6.text()
@@ -358,17 +404,22 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         componentRecv = self.checkBox_7.isChecked()
         rmaComp = self.checkBox_8.isChecked()
         rmaReturn = self.checkBox_6.isChecked()
+        rmaComplete = False
 
         res = QMessageBox.warning(self, 'Warning', 'The contents of RMA will be override!',
                                   buttons=QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Ok)
         if res == QMessageBox.StandardButton.Cancel:
             return
 
+        if componentSend and componentRecv and rmaComp and rmaReturn:
+            rmaComplete = True
+        print(f'complete flag is{rmaComplete}')
         self.session.query(Rma).filter_by(rma_id=rma_id).update({
             "date": initDate, "rmaETD": rmaETD, "rmaSrvDate": rmaSrvDate, "componentsSendFlag": componentSend,
-            "componentsRecvFlag": componentRecv, "rmaCompFlag": rmaComp, "rmaReturnFlag": rmaReturn})
+            "componentsRecvFlag": componentRecv, "rmaCompFlag": rmaComp, "rmaReturnFlag": rmaReturn,
+        "rmaCompleteFlag": rmaComplete})
         self.session.commit()
-
+        self.pushButton_14.clicked.connect(self.updateRma)
 
     # Information collector
     # Service provider and Engineer
@@ -430,6 +481,10 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         self.treeWidget.expandAll()
 
     def addNewSupporter(self):
+        try:
+            self.pushButton_9.disconnect()
+        except:
+            pass
         supporterName = self.lineEdit.text()
         currentDate = str(QDate.currentDate().toPyDate())
         description = self.plainTextEdit_90.toPlainText()
@@ -447,8 +502,13 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         self.lineEdit.setText('')
         self.plainTextEdit_90.setPlainText('')
         self.supporterAppearanceAdjust()
+        self.pushButton_9.clicked.connect(self.addNewSupporter)
 
     def addNewEngineer(self):
+        try:
+            self.pushButton_12.disconnect()
+        except:
+            pass
         engineerName = self.lineEdit_2.text()
         supporterName = self.comboBox.currentText()
         currentDate = str(QDate.currentDate().toPyDate())
@@ -464,6 +524,7 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         self.lineEdit_2.setText('')
         self.plainTextEdit_3.setPlainText('')
         self.supporterAppearanceAdjust()
+        self.pushButton_12.clicked.connect(self.addNewEngineer)
 
     def fillSupEngInfo(self, itemIndex):
         self.pushButton_9.setDisabled(True)
@@ -517,6 +578,10 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         self.plainTextEdit_3.setPlainText('')
 
     def updateEngineer(self):
+        try:
+            self.pushButton_11.disconnect()
+        except:
+            pass
         currentEngineer = self.treeWidget.currentItem()
         if currentEngineer.text(0):
             QMessageBox.warning(self, 'Warning', 'Cursor does not point to Engineer.\nPlease refresh data.')
@@ -533,9 +598,14 @@ class Casewindow(QMainWindow, Ui_MainWindow):
                 "name": engineerName, "description": engineerDesc
             })
             self.session.commit()
+        self.pushButton_11.clicked.connect(self.updateEngineer)
 
 
     def updateSupporter(self):
+        try:
+            self.pushButton_8.disconnect()
+        except:
+            pass
         currentSupporter = self.treeWidget.currentItem()
         if currentSupporter.text(1):
             QMessageBox.warning(self, 'Warning', 'Cursor does not point to Supporter.\nPlease refresh data.')
@@ -552,6 +622,7 @@ class Casewindow(QMainWindow, Ui_MainWindow):
                 "name": supporterName, "description": supporterDesc
             })
             self.session.commit()
+        self.pushButton_8.clicked.connect(self.updateSupporter)
 
 
     # Customer and Contacts
@@ -606,6 +677,10 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         self.treeWidget_3.expandAll()
 
     def addNewCustomer(self):
+        try:
+            self.pushButton_26.disconnect()
+        except:
+            pass
         customerName = self.lineEdit_3.text()
         currentDate = str(QDate.currentDate().toPyDate())
         description = self.plainTextEdit_91.toPlainText()
@@ -623,9 +698,13 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         self.lineEdit_3.setText('')
         self.plainTextEdit_91.setPlainText('')
         self.customerAppearanceAdjust()
-
+        self.pushButton_26.clicked.connect(self.addNewCustomer)
 
     def addNewContact(self):
+        try:
+            self.pushButton_30.disconnect()
+        except:
+            pass
         contactName = self.lineEdit_5.text()
         customerName = self.comboBox_3.currentText()
         currentDate = str(QDate.currentDate().toPyDate())
@@ -641,6 +720,7 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         self.lineEdit_5.setText('')
         self.plainTextEdit_3.setPlainText('')
         self.customerAppearanceAdjust()
+        self.pushButton_30.clicked.connect(self.addNewContact)
 
 
     def fillCusConInfo(self, itemIndex):
@@ -693,6 +773,10 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         self.plainTextEdit_8.setPlainText('')
 
     def updateCustomer(self):
+        try:
+            self.pushButton_17.disconnect()
+        except:
+            pass
         currentCustomer = self.treeWidget_3.currentItem()
         if not currentCustomer.text(0):
             QMessageBox.warning(self, 'Warning', 'Cursor does not point to Customer.\nPlease refresh data.')
@@ -709,9 +793,14 @@ class Casewindow(QMainWindow, Ui_MainWindow):
                 "name": customerName, "description": description
             })
             self.session.commit()
+        self.pushButton_17.clicked.connect(self.updateCustomer)
 
 
     def updateContact(self):
+        try:
+            self.pushButton_28.disconnect()
+        except:
+            pass
         currentContact = self.treeWidget_3.currentItem()
         if not currentContact.text(1):
             QMessageBox.warning(self, 'Warning', 'Cursor does not point to Contact.\nPlease refresh data.')
@@ -728,6 +817,7 @@ class Casewindow(QMainWindow, Ui_MainWindow):
                 "name": contactName, "description": description
             })
             self.session.commit()
+        self.pushButton_28.clicked.connect(self.updateContact)
 
 
 if __name__ == '__main__':

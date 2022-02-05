@@ -67,7 +67,7 @@
                </font>
               </property>
               <property name="text">
-               <string>Working RMA</string>
+               <string>Live Case</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
@@ -101,7 +101,7 @@
                </font>
               </property>
               <property name="text">
-               <string>Working RMA</string>
+               <string>Live RMA</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
@@ -135,7 +135,7 @@
                </font>
               </property>
               <property name="text">
-               <string>Working RMA</string>
+               <string>Oldest Case</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
@@ -169,7 +169,7 @@
                </font>
               </property>
               <property name="text">
-               <string>Working RMA</string>
+               <string>Oldest RMA</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
@@ -238,7 +238,7 @@
         <item>
          <widget class="QTabWidget" name="tabWidget_4">
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="tab_5">
            <attribute name="title">
@@ -247,16 +247,6 @@
            <layout class="QVBoxLayout" name="verticalLayout_18">
             <item>
              <layout class="QGridLayout" name="gridLayout_6">
-              <item row="0" column="0">
-               <widget class="QLabel" name="label_61">
-                <property name="text">
-                 <string>Case ID:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QLineEdit" name="lineEdit_9"/>
-              </item>
               <item row="1" column="0">
                <widget class="QLabel" name="label_63">
                 <property name="text">
@@ -264,8 +254,32 @@
                 </property>
                </widget>
               </item>
+              <item row="0" column="1">
+               <widget class="QLineEdit" name="lineEdit_9"/>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_61">
+                <property name="text">
+                 <string>Case ID:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QCheckBox" name="checkBox">
+                <property name="text">
+                 <string>Complete Status</string>
+                </property>
+               </widget>
+              </item>
               <item row="1" column="1">
                <widget class="QLineEdit" name="lineEdit_10"/>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_9">
+                <property name="text">
+                 <string>Case Complete:</string>
+                </property>
+               </widget>
               </item>
              </layout>
             </item>
@@ -335,7 +349,7 @@
               <item row="4" column="0">
                <widget class="QLabel" name="label_56">
                 <property name="text">
-                 <string>RMA ETD:</string>
+                 <string>RMA Determine:</string>
                 </property>
                </widget>
               </item>
@@ -421,6 +435,16 @@
                <widget class="QPushButton" name="pushButton_6">
                 <property name="text">
                  <string>Extended Info</string>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="2">
+               <widget class="QCheckBox" name="checkBox_2">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="text">
+                 <string>RmaComplete</string>
                 </property>
                </widget>
               </item>
@@ -981,6 +1005,12 @@
      <height>22</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+   </widget>
+   <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>

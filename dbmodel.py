@@ -14,6 +14,7 @@ class Case(Base):
     description = Column(String(400))
     rmas = relationship('Rma', backref='case')
     logs = relationship('logInfo', backref='case')
+    caseCompFlag = Column(Boolean, default=False)
 
 
 class Rma(Base):
@@ -31,6 +32,7 @@ class Rma(Base):
     componentsRecvFlag = Column(Boolean, default=False)
     rmaCompFlag = Column(Boolean, default=False)
     rmaReturnFlag = Column(Boolean, default=False)
+    rmaCompleteFlag = Column(Boolean, default=False)
     engineers = relationship('Engineer', secondary='linkrmaengineer')
     contacts = relationship('Contact', secondary='linkrmacontacts')
     old_hardware = relationship('Oldcomponent', backref=backref('rma', uselist=False))
