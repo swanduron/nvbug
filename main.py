@@ -219,6 +219,7 @@ class Casewindow(QMainWindow, Ui_MainWindow):
             self.pushButton_6.clicked.disconnect()
         except:
             pass
+        logBuffer = ''
         rmaID = self.lineEdit_4.text()
         dialogBox = serviceSelector(self.session, rmaID, self)
         dialogBox.exec()
@@ -226,13 +227,21 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         # Below function is used to assess whether the engineers and contacts records of DB need to be updated.
         engineerIDList = [int(i.text(2)) for i in engineerInfo]
         engineerIDList.sort()
+        engineerNameList = [i.text(1) for i in engineerInfo]
+        engineerNameList.sort()
         contactIDList = [int(i.text(2)) for i in contactInfo]
         contactIDList.sort()
+        contactNameList = [i.text(1) for i in contactInfo]
+        contactNameList.sort()
         rmaInstance = self.session.query(Rma).filter_by(rma_id=rmaID).one()
         currentEngineerIDList = [i.id for i in rmaInstance.engineers]
         currentEngineerIDList.sort()
+        currentEngineerNameList = [i.name for i in rmaInstance.engineers]
+        currentEngineerNameList.sort()
         currentContactIDList = [i.id for i in rmaInstance.contacts]
         currentContactIDList.sort()
+        currentContactNameList = [i.name for i in rmaInstance.contacts]
+        currentContactNameList.sort()
         if dialogBox.result(): # if dialogBox click OK, OK returns 1, cancel returns 0
             if engineerIDList != currentEngineerIDList:
                 rmaInstance.engineers.clear()
@@ -240,19 +249,32 @@ class Casewindow(QMainWindow, Ui_MainWindow):
                     engineerInstance = self.session.query(Engineer).filter_by(id=int(engineer.text(2))).one()
                     rmaInstance.engineers.append(engineerInstance)
                 # Need to add Logger here
+                logBuffer = f'''
+                        # ENG list: 
+                        {', '.join(currentEngineerNameList)}   ---> Out
+                        {', '.join(engineerNameList)}     <---  In
+                '''
+                logEngty = logInfo(content=logBuffer, date=str(QDate.currentDate().toPyDate()))
+                rmaInstance.logs.append(logEngty)
             if contactIDList != currentContactIDList:
                 rmaInstance.contacts.clear()
                 for contact in contactInfo:
                     contactInstance = self.session.query(Contact).filter_by(id=int(contact.text(2))).one()
                     rmaInstance.contacts.append(contactInstance)
                 # Need to add Logger here
+                logBuffer = f'''
+                        # Contact list:
+                        {', '.join(currentContactNameList)}  --->  Out
+                        {', '.join(contactNameList)}    <---  In
+                
+                '''
+                logEngty = logInfo(content=logBuffer, date=str(QDate.currentDate().toPyDate()))
+                rmaInstance.logs.append(logEngty)
             self.session.commit()
         ##demo code for index
         index = self.treeWidget_2.currentIndex()
         self.fillRmainfo(index)
         self.pushButton_6.clicked.connect(self.selectServiceInfo)
-
-
 
 
     def fillTree(self):
@@ -408,6 +430,8 @@ class Casewindow(QMainWindow, Ui_MainWindow):
                   rmaCompFlag=rmaComp, rmaReturnFlag=rmaReturn)
         parentCase = self.session.query(Case).filter_by(case_id=parentCaseID).one()
         parentCase.rmas.append(rma)
+        logBuffer = f'RMA entry created.'
+        rma.logs.append(logInfo(content=logBuffer, date=str(QDate.currentDate().toPyDate())))
         self.session.commit()
         self.fillTree()
         self.rmaAppearanceAdjust()
@@ -429,20 +453,43 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         rmaReturn = self.checkBox_6.isChecked()
         rmaComplete = False
 
-        res = QMessageBox.warning(self, 'Warning', 'The contents of RMA will be override!',
-                                  buttons=QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Ok)
-        if res == QMessageBox.StandardButton.Cancel:
-            return
+
 
         if componentSend and componentRecv and rmaComp and rmaReturn:
             rmaComplete = True
-        print(f'complete flag is{rmaComplete}')
-        self.session.query(Rma).filter_by(rma_id=rma_id).update({
+        rmaInstance = self.session.query(Rma).filter_by(rma_id=rma_id).one()
+        currentRecordStruct = {
+            "date": rmaInstance.date, "rmaETD": rmaInstance.rmaETD, "rmaSrvDate": rmaInstance.rmaSrvDate,
+            "componentsSendFlag": rmaInstance.componentsSendFlag, "componentsRecvFlag": rmaInstance.componentsRecvFlag,
+            "rmaCompFlag": rmaInstance.rmaCompFlag, "rmaReturnFlag": rmaInstance.rmaReturnFlag,
+            "rmaCompleteFlag": rmaInstance.rmaCompleteFlag
+        }
+
+        recordStruct ={
             "date": initDate, "rmaETD": rmaETD, "rmaSrvDate": rmaSrvDate, "componentsSendFlag": componentSend,
             "componentsRecvFlag": componentRecv, "rmaCompFlag": rmaComp, "rmaReturnFlag": rmaReturn,
-        "rmaCompleteFlag": rmaComplete})
-        self.session.commit()
-        self.pushButton_14.clicked.connect(self.updateRma)
+            "rmaCompleteFlag": rmaComplete}
+
+        changeStruct = dict()
+        origChangeStruct = dict()
+        for key in currentRecordStruct.keys():
+            if currentRecordStruct[key] != recordStruct[key]:
+                changeStruct[key] = recordStruct[key]
+                origChangeStruct[key] = currentRecordStruct[key]
+        if changeStruct:
+            res = QMessageBox.warning(self, 'Warning', 'The contents of RMA will be override!',
+                                      buttons=QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Ok)
+            if res == QMessageBox.StandardButton.Cancel:
+                return
+            self.session.query(Rma).filter_by(rma_id=rma_id).update(changeStruct)
+
+            logBuffer = f'{origChangeStruct}  -->  {changeStruct}'
+            logInstance = logInfo(content=logBuffer, date=str(QDate.currentDate().toPyDate()))
+            rmaInstance = self.session.query(Rma).filter_by(rma_id=rma_id).one()
+            rmaInstance.logs.append(logInstance)
+            self.session.commit()
+            self.pushButton_14.clicked.connect(self.updateRma)
+
 
     # Information collector
     # Service provider and Engineer
