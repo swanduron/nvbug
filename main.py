@@ -65,7 +65,13 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         self.fillDashboard()
 
     def dashboardAppearanceAdjust(self):
-        pass
+        self.pushButton.setFixedSize(QSize(100,100))
+        self.verticalLayout.addWidget(self.pushButton, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.pushButton_3.setFixedSize(QSize(100,100))
+        self.verticalLayout.addWidget(self.pushButton_3, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.pushButton_4.setFixedSize(QSize(100,100))
+        self.verticalLayout.addWidget(self.pushButton_4, alignment=Qt.AlignmentFlag.AlignCenter)
+
 
     def dashboardActionAttached(self):
         pass
@@ -73,12 +79,24 @@ class Casewindow(QMainWindow, Ui_MainWindow):
     def fillDashboard(self):
         liveCaseNumber = str(len(self.session.query(Case).filter_by(caseCompFlag=False).all()))
         liveRmaNumber = str(len(self.session.query(Rma).filter_by(rmaCompleteFlag=False).all()))
-        oldestCase = self.session.query(Case).filter_by(caseCompFlag=False).order_by(desc(Case.date)).all()[-1]
-        oldestRma = self.session.query(Rma).filter_by(rmaCompleteFlag=False).order_by(desc(Rma.date)).all()[-1]
+        try:
+            oldestCase = self.session.query(Case).filter_by(caseCompFlag=False).order_by(desc(Case.date)).all()[-1]
+        except IndexError:
+            oldestCase = 'N/A'
+        try:
+            oldestRma = self.session.query(Rma).filter_by(rmaCompleteFlag=False).order_by(desc(Rma.date)).all()[-1]
+        except IndexError:
+            oldestRma = 'N/A'
         self.label_2.setText(liveCaseNumber)
         self.label_4.setText(liveRmaNumber)
-        self.label_6.setText(oldestCase.case_id)
-        self.label_8.setText(oldestRma.rma_id)
+        try:
+            self.label_6.setText(oldestCase.case_id)
+        except AttributeError:
+            self.label_6.setText(oldestCase)
+        try:
+            self.label_8.setText(oldestRma.rma_id)
+        except AttributeError:
+            self.label_8.setText(oldestRma)
 
     # RMA operation
 
@@ -128,6 +146,33 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         self.lineEdit_10.installEventFilter(self)
 
         self.pushButton_5.clicked.connect(self.takeLog)
+
+        self.pushButton_23.clicked.connect(self.deleteCase)
+        self.pushButton_16.clicked.connect(self.deleteRma)
+
+    def deleteCase(self):
+        caseID = int(self.treeWidget_2.currentItem().text(2))
+        caseInstance = self.session.query(Case).filter_by(id=caseID).one()
+        res = QMessageBox.warning(self, 'Warning', f'The CASE {caseInstance.case_id} will be override!',
+                                  buttons=QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Ok)
+        if res == QMessageBox.StandardButton.Cancel:
+            return
+        self.session.query(Case).filter_by(id=caseID).delete()
+        self.session.commit()
+        self.treeWidget_2.clearSelection()
+        self.fillTree()
+
+    def deleteRma(self):
+        rmaID = int(self.treeWidget_2.currentItem().text(2))
+        rmaInstance = self.session.query(Rma).filter_by(id=rmaID).one()
+        res = QMessageBox.warning(self, 'Warning', f'The RMA {rmaInstance.rma_id} will be override!',
+                                  buttons=QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Ok)
+        if res == QMessageBox.StandardButton.Cancel:
+            return
+        self.session.query(Rma).filter_by(id=rmaID).delete()
+        self.session.commit()
+        self.treeWidget_2.clearSelection()
+        self.fillTree()
 
     def takeLog(self):
         try:
@@ -284,26 +329,37 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         for caseInstance in caseInstacneList:
             root = QTreeWidgetItem(self.treeWidget_2)
             root.setText(0, caseInstance.case_id)
+            if caseInstance.caseCompFlag:
+                root.setForeground(0, QColor('green'))
+            else:
+                root.setForeground(0, QColor('red'))
             root.setText(2, str(caseInstance.id))
             for rmaInstance in caseInstance.rmas:
                 child = QTreeWidgetItem(root)
                 child.setText(1, rmaInstance.rma_id)
+                if rmaInstance.rmaCompleteFlag:
+                    child.setForeground(1, QColor('green'))
+                else:
+                    child.setForeground(1, QColor('red'))
                 child.setText(2, str(rmaInstance.id))
         self.treeWidget_2.expandAll()
 
     def fillRmainfo(self, index):
         self.comboBox_2.setDisabled(True)
+        if not self.treeWidget_2.selectedItems():
+            return
         currentItem = self.treeWidget_2.itemFromIndex(index)
         # If selected item has no column 0
         if not currentItem.text(0):
             # RMA
             self.pushButton_6.setDisabled(False)
-            rma_id = currentItem.text(1)
+            # rma_id = currentItem.text(1)
+            rma_DBid = int(currentItem.text(2))
             self.pushButton_14.setDisabled(False)
             self.pushButton_16.setDisabled(False)
             self.pushButton_18.setDisabled(False)
             self.checkBox.setDisabled(True)
-            rmaInstance = self.session.query(Rma).filter_by(rma_id=rma_id).one()
+            rmaInstance = self.session.query(Rma).filter_by(id=rma_DBid).one()
             engineerInfo = engineerInfoGenerator(rmaInstance.engineers)
             contactInfo = contactInfoGenerator(rmaInstance.contacts)
 
@@ -313,7 +369,7 @@ class Casewindow(QMainWindow, Ui_MainWindow):
             case_id_list = [i[0] for i in res]
             self.comboBox_2.clear()
             self.comboBox_2.addItems(case_id_list)
-            self.lineEdit_4.setText(rma_id)
+            self.lineEdit_4.setText(rmaInstance.rma_id)
             self.lineEdit_6.setText(rmaInstance.date)
             self.lineEdit_7.setText(rmaInstance.rmaETD)
             self.lineEdit_8.setText(rmaInstance.rmaSrvDate)
@@ -322,8 +378,8 @@ class Casewindow(QMainWindow, Ui_MainWindow):
             self.checkBox_8.setChecked(rmaInstance.rmaCompFlag)
             self.checkBox_6.setChecked(rmaInstance.rmaReturnFlag)
             self.checkBox_2.setChecked(rmaInstance.rmaCompleteFlag)
-            self.plainTextEdit_4.setPlainText(engineerInfo)
-            self.plainTextEdit_5.setPlainText(contactInfo)
+            self.plainTextEdit_4.setPlainText(contactInfo)
+            self.plainTextEdit_5.setPlainText(engineerInfo)
             # Clear case tab
             self.lineEdit_9.setText('')
             self.lineEdit_10.setText('')
@@ -443,6 +499,8 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         except:
             pass
         # This function is used to update a rma information
+        rma_DBid = int(self.treeWidget_2.currentItem().text(2))
+        rmaInstance = self.session.query(Rma).filter_by(id=rma_DBid).one()
         rma_id = self.lineEdit_4.text()
         initDate = self.lineEdit_6.text()
         rmaETD = self.lineEdit_7.text()
@@ -454,21 +512,20 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         rmaComplete = False
 
 
-
         if componentSend and componentRecv and rmaComp and rmaReturn:
             rmaComplete = True
-        rmaInstance = self.session.query(Rma).filter_by(rma_id=rma_id).one()
+        # rmaInstance = self.session.query(Rma).filter_by(rma_id=rma_id).one()
         currentRecordStruct = {
             "date": rmaInstance.date, "rmaETD": rmaInstance.rmaETD, "rmaSrvDate": rmaInstance.rmaSrvDate,
             "componentsSendFlag": rmaInstance.componentsSendFlag, "componentsRecvFlag": rmaInstance.componentsRecvFlag,
             "rmaCompFlag": rmaInstance.rmaCompFlag, "rmaReturnFlag": rmaInstance.rmaReturnFlag,
-            "rmaCompleteFlag": rmaInstance.rmaCompleteFlag
+            "rmaCompleteFlag": rmaInstance.rmaCompleteFlag, "rma_id": rmaInstance.rma_id
         }
 
         recordStruct ={
             "date": initDate, "rmaETD": rmaETD, "rmaSrvDate": rmaSrvDate, "componentsSendFlag": componentSend,
             "componentsRecvFlag": componentRecv, "rmaCompFlag": rmaComp, "rmaReturnFlag": rmaReturn,
-            "rmaCompleteFlag": rmaComplete}
+            "rmaCompleteFlag": rmaComplete, "rma_id": rma_id}
 
         changeStruct = dict()
         origChangeStruct = dict()
@@ -481,15 +538,15 @@ class Casewindow(QMainWindow, Ui_MainWindow):
                                       buttons=QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Ok)
             if res == QMessageBox.StandardButton.Cancel:
                 return
-            self.session.query(Rma).filter_by(rma_id=rma_id).update(changeStruct)
+            self.session.query(Rma).filter_by(id=rma_DBid).update(changeStruct)
 
             logBuffer = f'{origChangeStruct}  -->  {changeStruct}'
             logInstance = logInfo(content=logBuffer, date=str(QDate.currentDate().toPyDate()))
-            rmaInstance = self.session.query(Rma).filter_by(rma_id=rma_id).one()
+            rmaInstance = self.session.query(Rma).filter_by(id=rma_DBid).one()
             rmaInstance.logs.append(logInstance)
             self.session.commit()
             self.pushButton_14.clicked.connect(self.updateRma)
-
+            self.fillTree()
 
     # Information collector
     # Service provider and Engineer
@@ -517,6 +574,34 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         self.pushButton_24.clicked.connect(self.newEngineerTmpl)
         self.pushButton_8.clicked.connect(self.updateSupporter)
         self.pushButton_11.clicked.connect(self.updateEngineer)
+        self.pushButton_13.clicked.connect(self.deleteEngineer)
+        self.pushButton_10.clicked.connect(self.deleteSupporter)
+
+    def deleteEngineer(self):
+
+        engineerID = int(self.treeWidget.currentItem().text(2))
+        engineerInstance = self.session.query(Engineer).filter_by(id=engineerID).one()
+        res = QMessageBox.warning(self, 'Warning', f'The Engineer {engineerInstance.name} will be deleted!',
+                                  buttons=QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Ok)
+        if res == QMessageBox.StandardButton.Cancel:
+            return
+        self.session.query(Engineer).filter_by(id=engineerID).delete()
+        self.session.commit()
+        self.treeWidget.clearSelection()
+        self.fillSupporterTree()
+
+    def deleteSupporter(self):
+
+        supporterID = int(self.treeWidget.currentItem().text(2))
+        supporterInstance = self.session.query(Supporter).filter_by(id=supporterID).one()
+        res = QMessageBox.warning(self, 'Warning', f'The Supporter {supporterInstance.name} will be deleted!',
+                                  buttons=QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Ok)
+        if res == QMessageBox.StandardButton.Cancel:
+            return
+        self.session.query(Supporter).filter_by(id=supporterID).delete()
+        self.session.commit()
+        self.treeWidget.clearSelection()
+        self.fillSupporterTree()
 
     def supporterSelectChangedDetector(self):
         # This function is used to track the keyboard operation of arrow up and down. Demo works in Win
@@ -599,6 +684,8 @@ class Casewindow(QMainWindow, Ui_MainWindow):
     def fillSupEngInfo(self, itemIndex):
         self.pushButton_9.setDisabled(True)
         self.pushButton_12.setDisabled(True)
+        if not self.treeWidget.selectedItems():
+            return
         # Below is the simple for getting widget item from index. In this function, the itemIndex(QModelIndex) is
         # general fall-back parameter of signal when click the treewidget
         currentItem = self.treeWidget.itemFromIndex(itemIndex)
@@ -720,7 +807,32 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         self.pushButton_29.clicked.connect(self.newContactTmpl)
         self.pushButton_17.clicked.connect(self.updateCustomer)
         self.pushButton_28.clicked.connect(self.updateContact)
+        self.pushButton_27.clicked.connect(self.deleteCustomer)
+        self.pushButton_31.clicked.connect(self.deleteContact)
 
+    def deleteCustomer(self):
+        customerID = int(self.treeWidget_3.currentItem().text(2))
+        customerInstance = self.session.query(Customer).filter_by(id=customerID).one()
+        res = QMessageBox.warning(self, 'Warning', f'The Customer {customerInstance.name} will be deleted!',
+                                  buttons=QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Ok)
+        if res == QMessageBox.StandardButton.Cancel:
+            return
+        self.session.query(Customer).filter_by(id=customerID).delete()
+        self.session.commit()
+        self.treeWidget_3.clearSelection()
+        self.fillCustomerTree()
+
+    def deleteContact(self):
+        contactID = int(self.treeWidget_3.currentItem().text(2))
+        contactInstance = self.session.query(Contact).filter_by(id=contactID).one()
+        res = QMessageBox.warning(self, 'Warning', f'The Contact {contactInstance.name} will be deleted!',
+                                  buttons=QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Ok)
+        if res == QMessageBox.StandardButton.Cancel:
+            return
+        self.session.query(Contact).filter_by(id=contactID).delete()
+        self.session.commit()
+        self.treeWidget_3.clearSelection()
+        self.fillCustomerTree()
 
     def customerSelectChangedDetector(self):
         # This function is used to track the keyboard operation of arrow up and down. Demo works in Win
@@ -796,6 +908,8 @@ class Casewindow(QMainWindow, Ui_MainWindow):
     def fillCusConInfo(self, itemIndex):
         self.pushButton_30.setDisabled(True)
         self.pushButton_26.setDisabled(True)
+        if not self.treeWidget_3.selectedItems():
+            return
         currentItem = self.treeWidget_3.itemFromIndex(itemIndex)
         if currentItem.text(0):
             # customer

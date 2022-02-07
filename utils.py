@@ -9,8 +9,14 @@ def engineerInfoGenerator(engineerList):
 
 def contactInfoGenerator(contactList):
     stringBuffer = ''
+    if contactList:
+        parentInstance = contactList[0].customer
+        stringBuffer += f'-----Customer INFO------\n' \
+                        f'Name: {parentInstance.name}\n' \
+                        f'{parentInstance.description}\n\n' \
+                        f'-----Contact INFO-------\n'
     for contact in contactList:
         contactName = contact.name
         contactDesc = contact.description
-        stringBuffer += f'{contactName}\n{contactDesc}\n--------------------\n'
+        stringBuffer += f'Name: {contactName}\n{contactDesc}\n--------------------\n'
     return stringBuffer
