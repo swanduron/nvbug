@@ -27,15 +27,25 @@ class dateSelector(QDialog):
 
 class textSelector(QDialog):
 
-    def __init__(self):
+    def __init__(self, rmaInstance):
         super(textSelector, self).__init__()
+        self.rmaInstance = rmaInstance
+        self.resize(600, 500)
         self.setupUi()
 
     def setupUi(self):
         self.resize(400, 300)
         self.verticalLayout = QVBoxLayout(self)
         self.verticalLayout.setObjectName("verticalLayout")
+        displayMessage = ''
+        self.showtextBox = QPlainTextEdit(self)
+        logMessages = self.rmaInstance.logs
+        for log in logMessages:
+            displayMessage += f'\n----------{log.date}-----------\n' \
+                              f'{log.content}\n'
+        self.showtextBox.setPlainText(displayMessage)
         self.textBox = QPlainTextEdit(self)
+        self.verticalLayout.addWidget(self.showtextBox)
         self.verticalLayout.addWidget(self.textBox)
         self.buttonBox = QDialogButtonBox(self)
         self.buttonBox.setStandardButtons(

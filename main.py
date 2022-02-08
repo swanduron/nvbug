@@ -180,9 +180,10 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         except:
             pass
         rmaID = self.lineEdit_4.text()
-        dialogBox = textSelector()
-        dialogBox.exec()
         rmaInstance = self.session.query(Rma).filter_by(rma_id=rmaID).one()
+        dialogBox = textSelector(rmaInstance)
+        dialogBox.resize(600, 500)
+        dialogBox.exec()
         if dialogBox.result():
             currentDate = str(QDate.currentDate().toPyDate())
             logText = dialogBox.getText()
@@ -294,8 +295,7 @@ class Casewindow(QMainWindow, Ui_MainWindow):
                     engineerInstance = self.session.query(Engineer).filter_by(id=int(engineer.text(2))).one()
                     rmaInstance.engineers.append(engineerInstance)
                 # Need to add Logger here
-                logBuffer = f'''
-                        # ENG list: 
+                logBuffer = f'''# ENG list: 
                         {', '.join(currentEngineerNameList)}   ---> Out
                         {', '.join(engineerNameList)}     <---  In
                 '''
@@ -307,8 +307,7 @@ class Casewindow(QMainWindow, Ui_MainWindow):
                     contactInstance = self.session.query(Contact).filter_by(id=int(contact.text(2))).one()
                     rmaInstance.contacts.append(contactInstance)
                 # Need to add Logger here
-                logBuffer = f'''
-                        # Contact list:
+                logBuffer = f'''# Contact list:
                         {', '.join(currentContactNameList)}  --->  Out
                         {', '.join(contactNameList)}    <---  In
                 
@@ -369,6 +368,7 @@ class Casewindow(QMainWindow, Ui_MainWindow):
             case_id_list = [i[0] for i in res]
             self.comboBox_2.clear()
             self.comboBox_2.addItems(case_id_list)
+            self.comboBox_2.setCurrentText(rmaInstance.case.case_id)
             self.lineEdit_4.setText(rmaInstance.rma_id)
             self.lineEdit_6.setText(rmaInstance.date)
             self.lineEdit_7.setText(rmaInstance.rmaETD)
