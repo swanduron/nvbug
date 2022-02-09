@@ -27,6 +27,9 @@ class Rma(Base):
     rmaETD = Column(String(40))
     rmaSrvDate = Column(String(40))
     description = Column(String(400))
+    rmaItemID = Column(String(40))
+    rmaPN = Column(String(40))
+    rmaOriSN = Column(String(40))
     # Add 4 flags to mark the progress during provide service
     componentsSendFlag = Column(Boolean, default=False)
     componentsRecvFlag = Column(Boolean, default=False)

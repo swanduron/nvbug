@@ -58,6 +58,22 @@ class textSelector(QDialog):
     def getText(self):
         return self.textBox.toPlainText()
 
+class pickupWindow(QDialog):
+
+    def __init__(self, info):
+        super(pickupWindow, self).__init__()
+        self.setWindowTitle('Pick up information template')
+        infoBox = QPlainTextEdit()
+        infoBox.setPlainText(info)
+        self.buttonBox = QDialogButtonBox(self)
+        self.buttonBox.setStandardButtons(
+            QDialogButtonBox.StandardButton.Cancel | QDialogButtonBox.StandardButton.Ok)
+        vbox = QVBoxLayout()
+        vbox.addWidget(infoBox)
+        vbox.addWidget(self.buttonBox)
+        self.setLayout(vbox)
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

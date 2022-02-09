@@ -346,67 +346,60 @@
            <attribute name="title">
             <string>RMA MGMT</string>
            </attribute>
-           <layout class="QVBoxLayout" name="verticalLayout_8">
+           <layout class="QVBoxLayout" name="verticalLayout_6">
             <item>
              <layout class="QGridLayout" name="gridLayout_4">
-              <item row="4" column="0">
-               <widget class="QLabel" name="label_56">
-                <property name="text">
-                 <string>RMA Determine:</string>
-                </property>
-               </widget>
-              </item>
               <item row="5" column="0">
-               <widget class="QLabel" name="label_58">
-                <property name="text">
-                 <string>RMA SrvDate:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="1">
-               <widget class="QLineEdit" name="lineEdit_4"/>
-              </item>
-              <item row="0" column="0">
-               <widget class="QLabel" name="label_48">
-                <property name="text">
-                 <string>Case ID:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QLabel" name="label_52">
-                <property name="text">
-                 <string>RMA dec:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="0">
                <widget class="QLabel" name="label_54">
                 <property name="text">
                  <string>RMA init Date:</string>
                 </property>
                </widget>
               </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="label_50">
-                <property name="text">
-                 <string>RMA ID:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="1">
-               <widget class="QLineEdit" name="lineEdit_6"/>
-              </item>
-              <item row="4" column="1">
-               <widget class="QLineEdit" name="lineEdit_7"/>
-              </item>
-              <item row="5" column="1">
-               <widget class="QLineEdit" name="lineEdit_8"/>
-              </item>
               <item row="1" column="2">
                <widget class="QCheckBox" name="checkBox_5">
                 <property name="text">
                  <string>ComponentSend</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QLineEdit" name="lineEdit_12"/>
+              </item>
+              <item row="3" column="2">
+               <widget class="QCheckBox" name="checkBox_8">
+                <property name="text">
+                 <string>RmaComp</string>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="1">
+               <widget class="QLineEdit" name="lineEdit_6"/>
+              </item>
+              <item row="7" column="1">
+               <widget class="QLineEdit" name="lineEdit_8"/>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLineEdit" name="lineEdit_4"/>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_10">
+                <property name="text">
+                 <string>RMA PN</string>
+                </property>
+               </widget>
+              </item>
+              <item row="6" column="2">
+               <widget class="QPushButton" name="pushButton_2">
+                <property name="text">
+                 <string>Pickup Info</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_48">
+                <property name="text">
+                 <string>Case ID:</string>
                 </property>
                </widget>
               </item>
@@ -417,37 +410,74 @@
                 </property>
                </widget>
               </item>
-              <item row="3" column="2">
-               <widget class="QCheckBox" name="checkBox_8">
-                <property name="text">
-                 <string>RmaComp</string>
-                </property>
-               </widget>
+              <item row="3" column="1">
+               <widget class="QLineEdit" name="lineEdit_11"/>
               </item>
-              <item row="4" column="2">
-               <widget class="QCheckBox" name="checkBox_6">
-                <property name="text">
-                 <string>RmaReturn</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QComboBox" name="comboBox_2"/>
-              </item>
-              <item row="2" column="1">
-               <widget class="QPushButton" name="pushButton_6">
-                <property name="text">
-                 <string>Extended Info</string>
-                </property>
-               </widget>
-              </item>
-              <item row="5" column="2">
+              <item row="0" column="2">
                <widget class="QCheckBox" name="checkBox_2">
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
                 <property name="text">
                  <string>RmaComplete</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_52">
+                <property name="text">
+                 <string>RMA Item ID</string>
+                </property>
+               </widget>
+              </item>
+              <item row="7" column="2">
+               <widget class="QPushButton" name="pushButton_6">
+                <property name="text">
+                 <string>Extended Info</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QComboBox" name="comboBox_2"/>
+              </item>
+              <item row="6" column="0">
+               <widget class="QLabel" name="label_56">
+                <property name="text">
+                 <string>RMA Determine:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_50">
+                <property name="text">
+                 <string>RMA ID:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="6" column="1">
+               <widget class="QLineEdit" name="lineEdit_7"/>
+              </item>
+              <item row="7" column="0">
+               <widget class="QLabel" name="label_58">
+                <property name="text">
+                 <string>RMA SrvDate:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="label_11">
+                <property name="text">
+                 <string>RMA Ori SN</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QLineEdit" name="lineEdit_13"/>
+              </item>
+              <item row="4" column="2">
+               <widget class="QCheckBox" name="checkBox_6">
+                <property name="text">
+                 <string>RmaReturn</string>
                 </property>
                </widget>
               </item>

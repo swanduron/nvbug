@@ -20,7 +20,6 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         self.DBSession = sessionmaker(bind=self.engine)
         self.session = self.DBSession()
         self.pushButton.clicked.connect(self.page1)
-        # self.pushButton_2.clicked.connect(self.page2)
         self.pushButton_3.clicked.connect(self.page3)
         self.pushButton_4.clicked.connect(self.page4)
         self.tabWidget.tabBar().hide()
@@ -114,6 +113,7 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         self.pushButton_15.setDisabled(True)
         self.pushButton_16.setDisabled(True)
         self.pushButton_6.setDisabled(True)
+        self.pushButton_2.setDisabled(True)
         # change treeWidget colume width
         self.treeWidget_2.setColumnWidth(0, 150)
         self.treeWidget_2.setColumnHidden(2, True)
@@ -149,6 +149,16 @@ class Casewindow(QMainWindow, Ui_MainWindow):
 
         self.pushButton_23.clicked.connect(self.deleteCase)
         self.pushButton_16.clicked.connect(self.deleteRma)
+
+        self.pushButton_2.clicked.connect(self.pickupInfoMaker)
+
+    def pickupInfoMaker(self):
+        rmaDBid = int(self.treeWidget_2.currentItem().text(2))
+        rmaInstance = self.session.query(Rma).filter_by(id=rmaDBid).one()
+        pickupTmpl = pickupEmailGen(rmaInstance)
+        pickupwin = pickupWindow(pickupTmpl)
+        pickupwin.resize(400, 300)
+        pickupwin.exec()
 
     def deleteCase(self):
         caseID = int(self.treeWidget_2.currentItem().text(2))
@@ -352,6 +362,7 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         if not currentItem.text(0):
             # RMA
             self.pushButton_6.setDisabled(False)
+            self.pushButton_2.setDisabled(False)
             # rma_id = currentItem.text(1)
             rma_DBid = int(currentItem.text(2))
             self.pushButton_14.setDisabled(False)
@@ -371,6 +382,9 @@ class Casewindow(QMainWindow, Ui_MainWindow):
             self.comboBox_2.setCurrentText(rmaInstance.case.case_id)
             self.lineEdit_4.setText(rmaInstance.rma_id)
             self.lineEdit_6.setText(rmaInstance.date)
+            self.lineEdit_11.setText(rmaInstance.rmaPN)
+            self.lineEdit_13.setText(rmaInstance.rmaOriSN)
+            self.lineEdit_12.setText(rmaInstance.rmaItemID)
             self.lineEdit_7.setText(rmaInstance.rmaETD)
             self.lineEdit_8.setText(rmaInstance.rmaSrvDate)
             self.checkBox_5.setChecked(rmaInstance.componentsSendFlag)
@@ -391,6 +405,7 @@ class Casewindow(QMainWindow, Ui_MainWindow):
             # Clicked a case instead of RMA
             self.tabWidget_4.setCurrentIndex(0)
             self.pushButton_6.setDisabled(True)
+            self.pushButton_2.setDisabled(True)
             self.pushButton_14.setDisabled(True)
             self.pushButton_16.setDisabled(True)
             self.pushButton_18.setDisabled(False)
@@ -399,6 +414,9 @@ class Casewindow(QMainWindow, Ui_MainWindow):
             self.comboBox_2.clear()
             self.lineEdit_4.setText('')
             self.lineEdit_6.setText('')
+            self.lineEdit_11.setText('')
+            self.lineEdit_13.setText('')
+            self.lineEdit_12.setText('')
             self.lineEdit_7.setText('')
             self.lineEdit_8.setText('')
             self.checkBox_5.setChecked(False)
@@ -452,6 +470,9 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         currentDay = str(QDate.currentDate().toPyDate())
         self.lineEdit_4.setText('')
         self.lineEdit_6.setText(currentDay)
+        self.lineEdit_11.setText('')
+        self.lineEdit_13.setText('')
+        self.lineEdit_12.setText('')
         self.lineEdit_7.setText('')
         self.lineEdit_8.setText('')
         self.checkBox_5.setChecked(False)
@@ -475,6 +496,9 @@ class Casewindow(QMainWindow, Ui_MainWindow):
             return
         initDate = self.lineEdit_6.text()
         rmaETD = self.lineEdit_7.text()
+        rmaItemID = self.lineEdit_12.text()
+        rmaPN = self.lineEdit_11.text()
+        rmaOriSN = self.lineEdit_13.text()
         rmaSrvDate = self.lineEdit_8.text()
         componentSend =self.checkBox_5.isChecked()
         componentRecv = self.checkBox_7.isChecked()
@@ -483,7 +507,7 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         parentCaseID = self.comboBox_2.currentText()
         rma = Rma(rma_id=rma_id, date=initDate, rmaETD=rmaETD, rmaSrvDate=rmaSrvDate,
                   componentsSendFlag=componentSend, componentsRecvFlag=componentRecv,
-                  rmaCompFlag=rmaComp, rmaReturnFlag=rmaReturn)
+                  rmaCompFlag=rmaComp, rmaReturnFlag=rmaReturn, rmaItemID=rmaItemID, rmaPN=rmaPN, rmaOriSN=rmaOriSN)
         parentCase = self.session.query(Case).filter_by(case_id=parentCaseID).one()
         parentCase.rmas.append(rma)
         logBuffer = f'RMA entry created.'
@@ -503,6 +527,9 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         rmaInstance = self.session.query(Rma).filter_by(id=rma_DBid).one()
         rma_id = self.lineEdit_4.text()
         initDate = self.lineEdit_6.text()
+        rmaItemID = self.lineEdit_12.text()
+        rmaPN = self.lineEdit_11.text()
+        rmaOriSN = self.lineEdit_13.text()
         rmaETD = self.lineEdit_7.text()
         rmaSrvDate = self.lineEdit_8.text()
         componentSend = self.checkBox_5.isChecked()
@@ -519,13 +546,16 @@ class Casewindow(QMainWindow, Ui_MainWindow):
             "date": rmaInstance.date, "rmaETD": rmaInstance.rmaETD, "rmaSrvDate": rmaInstance.rmaSrvDate,
             "componentsSendFlag": rmaInstance.componentsSendFlag, "componentsRecvFlag": rmaInstance.componentsRecvFlag,
             "rmaCompFlag": rmaInstance.rmaCompFlag, "rmaReturnFlag": rmaInstance.rmaReturnFlag,
-            "rmaCompleteFlag": rmaInstance.rmaCompleteFlag, "rma_id": rmaInstance.rma_id
+            "rmaCompleteFlag": rmaInstance.rmaCompleteFlag, "rma_id": rmaInstance.rma_id,
+            "rmaItemID": rmaInstance.rmaItemID, "rmaPN": rmaInstance.rmaPN, "rmaOriSN": rmaInstance.rmaOriSN
         }
 
         recordStruct ={
             "date": initDate, "rmaETD": rmaETD, "rmaSrvDate": rmaSrvDate, "componentsSendFlag": componentSend,
             "componentsRecvFlag": componentRecv, "rmaCompFlag": rmaComp, "rmaReturnFlag": rmaReturn,
-            "rmaCompleteFlag": rmaComplete, "rma_id": rma_id}
+            "rmaCompleteFlag": rmaComplete, "rma_id": rma_id, "rmaItemID": rmaItemID, "rmaPN": rmaPN,
+            "rmaOriSN": rmaOriSN
+        }
 
         changeStruct = dict()
         origChangeStruct = dict()
@@ -545,8 +575,9 @@ class Casewindow(QMainWindow, Ui_MainWindow):
             rmaInstance = self.session.query(Rma).filter_by(id=rma_DBid).one()
             rmaInstance.logs.append(logInstance)
             self.session.commit()
-            self.pushButton_14.clicked.connect(self.updateRma)
             self.fillTree()
+            self.rmaAppearanceAdjust()
+        self.pushButton_14.clicked.connect(self.updateRma)
 
     # Information collector
     # Service provider and Engineer
