@@ -153,12 +153,17 @@ class Casewindow(QMainWindow, Ui_MainWindow):
         self.pushButton_2.clicked.connect(self.pickupInfoMaker)
 
     def pickupInfoMaker(self):
+        try:
+            self.pushButton_2.disconnect()
+        except:
+            pass
         rmaDBid = int(self.treeWidget_2.currentItem().text(2))
         rmaInstance = self.session.query(Rma).filter_by(id=rmaDBid).one()
         pickupTmpl = pickupEmailGen(rmaInstance)
         pickupwin = pickupWindow(pickupTmpl)
         pickupwin.resize(400, 300)
         pickupwin.exec()
+        self.pushButton_2.clicked.connect(self.pickupInfoMaker)
 
     def deleteCase(self):
         caseID = int(self.treeWidget_2.currentItem().text(2))
