@@ -26,7 +26,10 @@ def pickupEmailGen(rmaInstance):
     # 1 x PDB and 1x CPU try, it will be generated 2 RMA records
     case_id = rmaInstance.case.case_id
     rmaContacts = ''
-    customerInstance = rmaInstance.contacts[0].customer
+    try:
+        customerInstance = rmaInstance.contacts[0].customer
+    except:
+        return 'No customer information is provided, please check RMA.'
     for contact in rmaInstance.contacts:
         rmaContacts += f'Name: {contact.name} \n {contact.description}'
 
