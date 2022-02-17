@@ -1,5 +1,6 @@
 from PyQt6.QtWidgets import *
 import sys
+from utils import *
 
 class dateSelector(QDialog):
 
@@ -74,6 +75,12 @@ class pickupWindow(QDialog):
         self.setLayout(vbox)
         self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.rejected.connect(self.reject)
+
+class pcieAddressFinder(QWidget):
+    
+    def __init__(self):
+        super(pcieAddressFinder, self).__init__()
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
