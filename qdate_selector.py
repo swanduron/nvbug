@@ -1,6 +1,7 @@
 from PyQt6.QtWidgets import *
 import sys
 from utils import *
+import io, re
 
 class dateSelector(QDialog):
 
@@ -76,14 +77,43 @@ class pickupWindow(QDialog):
         self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.rejected.connect(self.reject)
 
-class pcieAddressFinder(QWidget):
+class pcieAddressFinder(QDialog):
     
     def __init__(self):
         super(pcieAddressFinder, self).__init__()
+        self.setupUi()
+
+    def setupUi(self):
+        self.setWindowTitle('PCIe Address Finder for DGXA100')
+        vbox = QVBoxLayout()
+        self.buttonBox = QDialogButtonBox(self)
+        self.buttonBox.setStandardButtons(
+            QDialogButtonBox.StandardButton.Cancel | QDialogButtonBox.StandardButton.Ok)
+        self.inputBox = QLineEdit()
+        self.inputBox.textChanged.connect(self.dataFill)
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
+        self.pcieInfoList = QListWidget()
+
+        vbox.addWidget(self.inputBox)
+        vbox.addWidget(self.pcieInfoList)
+        vbox.addWidget(self.buttonBox)
+        self.setLayout(vbox)
+        self.dataFill()
+
+    def dataFill(self, event=None):
+        print(event)
+        # io.StringIO is used to roll a string back to a file IO that gives many functions such as readlines
+        infoData = [i.strip() for i in io.StringIO(pcieTree).readlines()]
+        if event:
+            infoData = [i for i in infoData if re.findall(event, i, re.I)]
+        self.pcieInfoList.clear()
+        self.pcieInfoList.addItems(infoData)
+
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    window = dateSelector()
+    window = pcieAddressFinder()
     window.show()
     sys.exit(app.exec())
